@@ -1,0 +1,26 @@
+﻿* Make sure all SharpDX objects get disposed after use
+* Modify the overloads to render to
+	* WriteableBitmap (using texture buffer to pixel buffer copy)
+	* PNG file (already implemented)
+	* PNG stream (already implemented)
+* Add renderers
+	* ImageRenderer
+	* Shape renderers
+		* Path
+			* Stretch property support
+			* Better positioning than with transform
+    -------------------
+	The ones below seem to be lower priority
+
+		* Polygon
+		* Polyline
+	* TextBox
+	* RichTextBlock
+	* RichTextBox
+	* DirectX interop components?
+* Add support for element properties
+	* Border's border (it supports various weird thickness combinations for each side)
+	* Opacity
+	* Clip
+	* RenderTransform
+	* TextBlock Inlines

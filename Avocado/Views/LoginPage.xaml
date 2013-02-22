@@ -1,0 +1,34 @@
+﻿<Page
+    x:Class="Avocado.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Avocado"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodel="using:Avocado.ViewModel"
+    mc:Ignorable="d"
+    >
+    <Page.DataContext>
+        <viewmodel:Login></viewmodel:Login>
+    </Page.DataContext>
+
+    <Grid Background="#3E5828">
+        <StackPanel Orientation="Vertical" Height="300" Width="300" >
+            <StackPanel Orientation="Horizontal" Width="300">
+                <Image Margin="5" Source="../Assets/Logo.png" Height="40"/>
+                <TextBlock Text="Welcome" FontSize="40"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock FontSize="30" Text="Email" Height="35" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox Text="{Binding Email, Mode=TwoWay}"  TabIndex="1" Name="email" Width="280" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock FontSize="30" Text="Password" Height="35" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <PasswordBox Password="{Binding Password, Mode=TwoWay}" TabIndex="2" Name="password" Height="35" Width="280" HorizontalAlignment="Left" VerticalAlignment="Top">
+                </PasswordBox>
+            </StackPanel>
+            <Button Command="{Binding AttemptLoginCommand}" HorizontalAlignment="Right">Login</Button>
+        </StackPanel>
+    </Grid>
+    
+</Page>
