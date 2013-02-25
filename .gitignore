@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+*.pfx
 
 # External tool builders
 .externalToolBuilders/
