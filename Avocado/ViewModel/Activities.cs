@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +9,11 @@ using System.Windows.Input;
 using Avocado.DataModel;
 using MetroMVVM;
 using MetroMVVM.Commands;
+using MetroMVVM.Threading;
+using Windows.Foundation;
 using Windows.System;
+using Windows.System.Threading;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 
 namespace Avocado.ViewModel
@@ -52,8 +58,18 @@ namespace Avocado.ViewModel
                                      where list.Id == value.Id
                                      select list).First();
                 SelectedTab = TabType.Lists;
+                selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y)); 
                 RaisePropertyChanged("SelectedListModel"); 
             } 
+        }
+
+        private object ListItemDrop(object t, NotifyCollectionChangedEventArgs y)
+        {
+            if (y.Action == NotifyCollectionChangedAction.Add)
+            {
+                EditListItem(((ObservableCollection<ListItemModel>)t)[y.NewStartingIndex], false, y.NewStartingIndex);
+            }
+            return t;
         }
 
         private string newMessage;
@@ -63,6 +79,10 @@ namespace Avocado.ViewModel
         {
             get
             {
+                if (Couple == null)
+                {
+                    return string.Empty;
+                }
                 return string.Format("Send {0} a message...", Couple.OtherUser.FirstName);
             }
         }
@@ -73,11 +93,15 @@ namespace Avocado.ViewModel
                 if (!string.IsNullOrEmpty(NewMessage))
                 {
                     IsLoading = true;
-                    AuthClient.SendMessage(NewMessage);
-                    IsLoading = false;
+                    var task = ThreadPool.RunAsync(t =>
+                    {
+                        AuthClient.SendMessage(NewMessage);
+                        
+                    });
+                    task.Completed = RunOnComplete(Update);
+
                 }
                 NewMessage = "";
-                Update();
             }
         }
         public ICommand NewMessageKeyDownCommand
@@ -123,11 +147,22 @@ namespace Avocado.ViewModel
 
         #region ListItemActions
 
-        public void EditListItem(ListItemModel listItem)
+        public void EditListItem(ListItemModel listItem, bool delete = false, int index = -1)
         {
             IsLoading = true;
-            AuthClient.EditListItem(listItem);
-            IsLoading = false;
+            var parentList = (from l in ListModelList
+                         where l.Id == listItem.ListId
+                         select l).First();
+
+            if (index == -1)
+            {
+                index = GetListItemIndex(parentList, listItem.Complete, listItem.Important);
+                parentList.Items.Remove(listItem);
+                parentList.Items.Insert(index, listItem);
+                SelectedListModel.Items = parentList.Items;
+            }
+            var task = ThreadPool.RunAsync(t => AuthClient.EditListItem(listItem, index, delete));
+            task.Completed = RunOnComplete(() => { IsLoading = false; });
         }
 
         public ICommand EditListItemCommand
@@ -149,6 +184,74 @@ namespace Avocado.ViewModel
             get
             {
                 return new RelayCommand<ListItemModel>(param => { ToggleListItemImportant(param); });
+            }
+        }
+
+        public ICommand DeleteListItemCommand
+        {
+            get
+            {
+                return new RelayCommand<ListItemModel>(param => EditListItem(param, true));
+            }
+        }
+
+        private string newListItemText;
+        public string NewListItemText
+        {
+            get
+            {
+                return newListItemText;
+            }
+            set
+            {
+                newListItemText = value;
+                RaisePropertyChanged("NewListItemText");
+            }
+        }
+
+        public void NewListItemKeyDown(KeyRoutedEventArgs args)
+        {
+            if (args.Key == VirtualKey.Enter)
+            {
+                if (!string.IsNullOrEmpty(NewListItemText))
+                {
+                    IsLoading = true;
+                    var index = GetListItemIndex(SelectedListModel, false, false);
+                    SelectedListModel.Items.Insert(index, new ListItemModel() { Text = NewListItemText });
+                    var task = ThreadPool.RunAsync(t => AuthClient.CreateListItem(NewListItemText, SelectedListModel.Id, index));
+
+                    task.Completed = RunOnComplete(Update);
+
+                }
+                NewListItemText = "";
+            }
+        }
+
+        public ICommand NewListItemKeyDownCommand
+        {
+            get
+            {
+                return new RelayCommand<KeyRoutedEventArgs>(param => NewListItemKeyDown(param));
+            }
+        }
+
+        public int GetListItemIndex(ListModel list, bool complete, bool important)
+        {
+            if (important && !complete) // important and not complete, just add it to the beginning of the list
+            {
+                return 0;
+            }
+            else if(!important && !complete) // not important and not complete, add it after all important items
+            {
+                return (from l in list.Items
+                        where l.Important && !l.Complete
+                        select l).Count();
+            } 
+            else // any completed item can be added moved to the end of all uncompleted items 
+            {
+                return (from l in list.Items
+                        where !l.Complete
+                        select l).Count();
             }
         }
 
@@ -262,23 +365,58 @@ namespace Avocado.ViewModel
 
         public Activities()
         {
-           
+            DispatcherHelper.Initialize();
         }
 
-        public void Update()
+        public AsyncActionCompletedHandler RunOnComplete(Action method)
         {
-            IsLoading = true;
-            Couple = AuthClient.GetUsers();
-            ActivityList = AuthClient.GetActivities();
-            ListModelList = AuthClient.GetListModelList();
+            return new AsyncActionCompletedHandler((IAsyncAction source, AsyncStatus status) =>
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(() => { method(); });
+            });
+        }
 
+        public async Task UpdateData()
+        {
+            couple = AuthClient.GetUsers();
+            activityList = AuthClient.GetActivities();
+            listModelList = AuthClient.GetListModelList();
+            return;
+        }
+
+        public void ProcessUpdate()
+        {
+            Couple = couple;
+            ActivityList = activityList;
+            ListModelList = listModelList;
             foreach (var activity in ActivityList)
             {
                 activity.User = activity.UserId == Couple.CurrentUser.Id ? Couple.CurrentUser : Couple.OtherUser;
             }
             ActivityList.Reverse();
+
+            var tab = SelectedTab;
+            var selectedList = SelectedListModel;
+
             SelectedActivity = ActivityList.First();
+            SelectedListModel = selectedList;
+
+            //restore the selected tab in case restoring the selected list caused this to change
+            SelectedTab = tab;
             IsLoading = false;
         }
+
+        public void Update()
+        {
+            IsLoading = true;
+            var task = ThreadPool.RunAsync(t => UpdateData());
+
+            task.Completed = new AsyncActionCompletedHandler((IAsyncAction source, AsyncStatus status) =>
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(() => ProcessUpdate());
+            });
+        }
+
+
     }
 }

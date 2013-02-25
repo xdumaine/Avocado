@@ -213,7 +213,7 @@ namespace Avocado.DataModel
             }
         }
 
-        public void EditListItem(ListItemModel listItem)
+        public void EditListItem(ListItemModel listItem, int index, bool delete = false)
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -223,10 +223,38 @@ namespace Avocado.DataModel
                 HttpContent body = new FormUrlEncodedContent(new[] { 
                     new KeyValuePair<string, string>("text", listItem.Text), 
                     new KeyValuePair<string, string>("complete", listItem.Complete ? "1" : "0"),
-                    new KeyValuePair<string, string>("important", listItem.Important ? "1" : "0")
+                    new KeyValuePair<string, string>("important", listItem.Important ? "1" : "0"),
+                    new KeyValuePair<string, string>("index", index.ToString())
                 });
                 //create the new request
-                var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id);
+                var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id + (delete ? "/delete" : ""));
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+                var response = client.PostAsync(uri, body);
+
+                response.Result.EnsureSuccessStatusCode();
+
+            }
+        }
+
+        public void CreateListItem(string listItemText, string listId, int index)
+        {
+            if (string.IsNullOrEmpty(listItemText))
+            {
+                return;
+            }
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                HttpContent body = new FormUrlEncodedContent(new[] { 
+                    new KeyValuePair<string, string>("text", listItemText),
+                    new KeyValuePair<string, string>("index", index.ToString())
+                });
+                //create the new request
+                var uri = new Uri(API_URL_LISTS + listId);
                 client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
                 client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
                 cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));

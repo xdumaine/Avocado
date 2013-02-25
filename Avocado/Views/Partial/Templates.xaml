@@ -64,7 +64,8 @@
             <controls:ImageButton Grid.Column="3" Width="40" VerticalAlignment="Center"
                                   NormalStateImageSource="../Assets/avo-delete.png" 
                                   HoverStateImageSource="../Assets/avo-delete-hover.png"
-                                  PressedStateImageSource="../Assets/avo-delete-hover.png"/>
+                                  PressedStateImageSource="../Assets/avo-delete-hover.png"
+                                  Command="{Binding ElementName=ListDetail, Path=DataContext.DeleteListItemCommand}" CommandParameter="{Binding}"/>
         </Grid>
     </DataTemplate>
     

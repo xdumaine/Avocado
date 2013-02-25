@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -175,7 +176,8 @@ namespace Avocado.DataModel
         public string Name { get; set; }
         public long TimeCreated { get; set; }
         public long TimeUpdated { get; set; }
-        public List<ListItemModel> Items { get; set; }
+        public ObservableCollection<ListItemModel> Items { get; set; }
+        
     }
 
     public class ListItemModel : ObservableObject
