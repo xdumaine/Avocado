@@ -159,9 +159,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Win8Controls:Calendar Grid.Row="0" DatePropertyNameForDatesSource="StartDate" DatesSource="{Binding CalendarItems}"  >
-                
-            </Win8Controls:Calendar>
+            <Win8Controls:Calendar ShowSelectedDate="True" Grid.Row="0" CalendarItemStyle="{StaticResource AvoCalendarItemStyle}" 
+                                   DatePropertyNameForDatesSource="StartDate" SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
+                                   SelectedDateCommand="{Binding SelectDateCommand}" DatesSource="{Binding CalendarItems}"  />
         </Grid>
     </Grid>
 </common:LayoutAwarePage>

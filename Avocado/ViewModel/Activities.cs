@@ -366,11 +366,37 @@ namespace Avocado.ViewModel
         #region Calendar
 
         private ObservableCollection<CalendarItem> calendarItems;
-
         public ObservableCollection<CalendarItem> CalendarItems
         {
             get { return calendarItems; }
             set { calendarItems = value; RaisePropertyChanged("CalendarItems"); }
+        }
+
+        private DateTime selectedDate;
+        public DateTime SelectedDate
+        {
+            get
+            {
+                return selectedDate;
+            }
+            set
+            {
+                selectedDate = value;
+                RaisePropertyChanged("SelectedDate");
+            }
+        }
+
+        public void SelectDate(DateTime date)
+        {
+
+        }
+
+        public ICommand SelectDateCommand
+        {
+            get
+            {
+                return new RelayCommand<DateTime>(d => SelectDate(d));
+            }
         }
 
         #endregion

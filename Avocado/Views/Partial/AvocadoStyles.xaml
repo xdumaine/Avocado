@@ -10,6 +10,7 @@
     <common:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"></common:InverseBooleanToVisibilityConverter>
     <common:BooleanToStringConverter x:Key="BooleanToStringConverter"></common:BooleanToStringConverter>
 
+    <SolidColorBrush x:Key="AvocadoGreen" Color="#FF62943C" />
 
     <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="#FF62943C" />
     <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBackgroundThemeBrush" Color="#9962943C" />
@@ -406,6 +407,7 @@
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="FullScreenPortrait"/>
+                                
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
                         <Grid x:Name="grid" MaxHeight="10000" MaxWidth="10000">
@@ -492,12 +494,12 @@
         <Setter Property="FontSize" Value="18"/>
     </Style>
 
-    <Style TargetType="Win8Controls:CalendarItem">
-        <Setter Property="Foreground"  Value="White"/>
+    <Style x:Key="AvoCalendarItemStyle" TargetType="Win8Controls:CalendarItem">
+        <Setter Property="Foreground"  Value="Black"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate  TargetType="Win8Controls:CalendarItem">
-                    <Grid x:Name="root" d:DesignWidth="272" d:DesignHeight="246" Margin="3,3,3,5">
+                    <Grid x:Name="root" d:DesignWidth="272" d:DesignHeight="246" Margin="3,3,3,5" >
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="Orientation">
                                 <VisualState x:Name="FullScreenLandscape"/>
@@ -543,10 +545,30 @@
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Filled"/>
+                                
+                                
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SelectionStates">
+
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="shine">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ListViewItemSelectedPointerOverBackgroundThemeBrush}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="DayNumberBlock">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="WhiteSmoke"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="Indicator">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="WhiteSmoke"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
+                        <Border BorderThickness="5" BorderBrush="{StaticResource AvocadoGreen}" Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         <Border x:Name="border1" BorderThickness="1,1,1,1" CornerRadius="0">
-                            <Border x:Name="border" BorderBrush="#FF000000" BorderThickness="1,1,1,1" CornerRadius="0">
+                            <Border x:Name="border" BorderBrush="Transparent" BorderThickness="5" CornerRadius="0">
                                 <Border.Background>
                                     <SolidColorBrush Color="#FF62943C"/>
                                 </Border.Background>
@@ -562,13 +584,13 @@
                                     <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
                                             Margin="0,0,0,0" x:Name="shine" CornerRadius="0" Grid.RowSpan="2">
                                         <Border.Background>
-                                            <SolidColorBrush Color="#FF62943C"/>
+                                            <SolidColorBrush Color="WhiteSmoke"/>
                                         </Border.Background>
                                     </Border>
                                     <TextBlock 
                                     	x:Name="DayNumberBlock"
                                     	Text="{Binding DayNumber, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                    	Foreground="White" 
+                                    	Foreground="{StaticResource AvocadoGreen}" 
                                     	FontWeight="ExtraBold"
                                     	FontSize="40"
                                     	HorizontalAlignment="Center" 
@@ -576,8 +598,9 @@
                                     	Margin="0,0,0,0"/>
                                     
                                     <TextBlock
-                                        x:Name="ExtraText"
-                                        Text="{Binding Indicator}" 
+                                        x:Name="Indicator"
+                                        Text="{Binding Indicator}"
+                                        Foreground="{StaticResource AvocadoGreen}" 
                                         TextWrapping="Wrap"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Bottom"
