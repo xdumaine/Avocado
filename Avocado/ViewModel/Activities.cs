@@ -363,6 +363,18 @@ namespace Avocado.ViewModel
         }
         #endregion
 
+        #region Calendar
+
+        private ObservableCollection<CalendarItem> calendarItems;
+
+        public ObservableCollection<CalendarItem> CalendarItems
+        {
+            get { return calendarItems; }
+            set { calendarItems = value; RaisePropertyChanged("CalendarItems"); }
+        }
+
+        #endregion
+
         public Activities()
         {
             DispatcherHelper.Initialize();
@@ -381,6 +393,7 @@ namespace Avocado.ViewModel
             couple = AuthClient.GetUsers();
             activityList = AuthClient.GetActivities();
             listModelList = AuthClient.GetListModelList();
+            calendarItems = AuthClient.GetCalendar();
             return;
         }
 
@@ -389,6 +402,7 @@ namespace Avocado.ViewModel
             Couple = couple;
             ActivityList = activityList;
             ListModelList = listModelList;
+            CalendarItems = calendarItems;
             foreach (var activity in ActivityList)
             {
                 activity.User = activity.UserId == Couple.CurrentUser.Id ? Couple.CurrentUser : Couple.OtherUser;
@@ -411,10 +425,7 @@ namespace Avocado.ViewModel
             IsLoading = true;
             var task = ThreadPool.RunAsync(t => UpdateData());
 
-            task.Completed = new AsyncActionCompletedHandler((IAsyncAction source, AsyncStatus status) =>
-            {
-                DispatcherHelper.CheckBeginInvokeOnUI(() => ProcessUpdate());
-            });
+            task.Completed = RunOnComplete(ProcessUpdate);
         }
 
 

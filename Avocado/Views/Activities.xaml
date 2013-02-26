@@ -10,6 +10,7 @@
     xmlns:viewmodel="using:Avocado.ViewModel"
     xmlns:controls="using:WinRTXamlToolkit.Controls"
     xmlns:WinRtBehaviors="using:WinRtBehaviors" xmlns:Behaviors="using:Win8nl.Behaviors"
+    xmlns:Win8Controls="using:Win8Controls"
     mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary Source="/Views/Partial/Templates.xaml"></ResourceDictionary>
@@ -58,7 +59,7 @@
                 </WinRtBehaviors:Interaction.Behaviors>
             </controls:WatermarkTextBox>
         </Grid>
-        <Grid Margin="20,0,0,0" x:Name="titlePanel2" Grid.Column="2">
+        <Grid Margin="20,0,0,0" x:Name="titlePanel2" Grid.Column="2" Visibility="{Binding Path=IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="80"/>
@@ -153,5 +154,14 @@
             </ListView>
         </Grid>
         
+        <Grid Name="CalendarDetail" Margin="20,60,20,0" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+              Visibility="{Binding IsCalendarTabActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Win8Controls:Calendar Grid.Row="0" DatePropertyNameForDatesSource="StartDate" DatesSource="{Binding CalendarItems}"  >
+                
+            </Win8Controls:Calendar>
+        </Grid>
     </Grid>
 </common:LayoutAwarePage>

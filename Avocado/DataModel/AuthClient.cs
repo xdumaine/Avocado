@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 
 namespace Avocado.DataModel
 {
@@ -22,6 +23,7 @@ namespace Avocado.DataModel
         private static string API_URL_ACTIVITIES = API_URL_BASE + "activities";
         private static string API_URL_LISTS = API_URL_BASE + "lists/";
         private static string API_URL_CONVERSATION = API_URL_BASE + "conversation/";
+        private static string API_URL_CALENDAR = API_URL_BASE + "calendar/";
         private static string COOKIE_NAME = "user_email";
         private static string USER_AGENT = "Avocado Windows 8 Client v.1.0";
         private static string ERROR_MSG = "\nFAILED.  Signature was tested and failed. Try again and check the auth information.";
@@ -210,6 +212,31 @@ namespace Avocado.DataModel
                 }
 
                 return lists;
+            }
+        }
+
+        public ObservableCollection<CalendarItem> GetCalendar()
+        {
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                //create the new request
+                var uri = new Uri(API_URL_CALENDAR + "?days=120");
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+                var response = client.GetAsync(uri);
+
+                response.Result.EnsureSuccessStatusCode();
+                var responseText = response.Result.Content.ReadAsStringAsync().Result;
+
+                var settings = new Newtonsoft.Json.JsonSerializerSettings();
+                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                var calendarItems = JsonConvert.DeserializeObject<ObservableCollection<CalendarItem>>(responseText, settings);
+
+                return calendarItems;
             }
         }
 

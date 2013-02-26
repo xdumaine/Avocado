@@ -222,6 +222,9 @@
     <Reference Include="System.Reactive.PlatformServices">
       <HintPath>..\packages\Rx-PlatformServices.2.0.21114\lib\WinRT45\System.Reactive.PlatformServices.dll</HintPath>
     </Reference>
+    <Reference Include="Win8Controls">
+      <HintPath>..\packages\Win8Controls.0.9.2\lib\netcore45\Win8Controls.dll</HintPath>
+    </Reference>
     <Reference Include="Win8nl">
       <HintPath>..\packages\Win8nl.1.0.7\lib\NetCore45\Win8nl.dll</HintPath>
     </Reference>
