@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ using MetroMVVM;
 using MetroMVVM.Commands;
 using MetroMVVM.Threading;
 using Windows.Foundation;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 using Windows.System;
 using Windows.System.Threading;
 using Windows.UI.Xaml;
@@ -22,7 +26,7 @@ namespace Avocado.ViewModel
     {
         Activities, 
         Lists, 
-        Photos, 
+        Media, 
         Preferences,
         Calendar
     }
@@ -39,6 +43,12 @@ namespace Avocado.ViewModel
 
         private List<ListModel> listModelList;
         public List<ListModel> ListModelList { get { return listModelList; } set { listModelList = value; RaisePropertyChanged("ListModelList"); } }
+
+        private List<MediaModel> mediaList;
+        public List<MediaModel> MediaList { get { return mediaList; } set { mediaList = value; RaisePropertyChanged("MediaList"); } }
+
+        public MediaModel selectedMediaListItem;
+        public MediaModel SelectedMediaListItem { get { return selectedMediaListItem; } set { selectedMediaListItem = value; RaisePropertyChanged("SelectedMediaListItem"); } }
         
         private ListModel selectedListModel;
         public ListModel SelectedListModel { 
@@ -93,9 +103,10 @@ namespace Avocado.ViewModel
                 if (!string.IsNullOrEmpty(NewMessage))
                 {
                     IsLoading = true;
+                    var clone = NewMessage;
                     var task = ThreadPool.RunAsync(t =>
                     {
-                        AuthClient.SendMessage(NewMessage);
+                        AuthClient.SendMessage(clone);
                         
                     });
                     task.Completed = RunOnComplete(Update);
@@ -142,6 +153,19 @@ namespace Avocado.ViewModel
             }
         }
 
+        public void Logout()
+        {
+
+        }
+
+        public ICommand LogoutCommand
+        {
+            get
+            {
+                return new RelayCommand(() => { Logout(); });
+            }
+        }
+
         private bool isLoading;
         public bool IsLoading { get { return isLoading; } set { isLoading = value; RaisePropertyChanged("IsLoading"); } }
 
@@ -149,6 +173,10 @@ namespace Avocado.ViewModel
 
         public void EditListItem(ListItemModel listItem, bool delete = false, int index = -1)
         {
+            if (string.IsNullOrEmpty(listItem.ListId))
+            {
+                return;
+            }
             IsLoading = true;
             var parentList = (from l in ListModelList
                          where l.Id == listItem.ListId
@@ -157,9 +185,12 @@ namespace Avocado.ViewModel
             if (index == -1)
             {
                 index = GetListItemIndex(parentList, listItem.Complete, listItem.Important);
-                parentList.Items.Remove(listItem);
-                parentList.Items.Insert(index, listItem);
+                parentList.Items.Move(parentList.Items.IndexOf(listItem), index);
                 SelectedListModel.Items = parentList.Items;
+            }
+            if (delete)
+            {
+                parentList.Items.Remove(listItem);
             }
             var task = ThreadPool.RunAsync(t => AuthClient.EditListItem(listItem, index, delete));
             task.Completed = RunOnComplete(() => { IsLoading = false; });
@@ -218,7 +249,8 @@ namespace Avocado.ViewModel
                     IsLoading = true;
                     var index = GetListItemIndex(SelectedListModel, false, false);
                     SelectedListModel.Items.Insert(index, new ListItemModel() { Text = NewListItemText });
-                    var task = ThreadPool.RunAsync(t => AuthClient.CreateListItem(NewListItemText, SelectedListModel.Id, index));
+                    var clone = NewListItemText;
+                    var task = ThreadPool.RunAsync(t => AuthClient.CreateListItem(clone, SelectedListModel.Id, index));
 
                     task.Completed = RunOnComplete(Update);
 
@@ -270,7 +302,7 @@ namespace Avocado.ViewModel
                 selectedTab = value;
                 RaisePropertyChanged("SelectedTab");
                 RaisePropertyChanged("IsActivityTabActive");
-                RaisePropertyChanged("IsPhotoTabActive");
+                RaisePropertyChanged("IsMediaTabActive");
                 RaisePropertyChanged("IsListTabActive");
                 RaisePropertyChanged("IsCalendarTabActive");
                 RaisePropertyChanged("IsPreferenceTabActive");
@@ -285,11 +317,11 @@ namespace Avocado.ViewModel
             }
         }
         
-        public bool IsPhotoTabActive
+        public bool IsMediaTabActive
         {
             get
             {
-                return SelectedTab == TabType.Photos;
+                return SelectedTab == TabType.Media;
             }
         }
         
@@ -330,11 +362,11 @@ namespace Avocado.ViewModel
             }
         }
 
-        public ICommand SetPhotoTabActiveCommand
+        public ICommand SetMediaTabActiveCommand
         {
             get
             {
-                return new RelayCommand(() => { SetTabActive(TabType.Photos); });
+                return new RelayCommand(() => { SetTabActive(TabType.Media); });
             }
         }
 
@@ -386,6 +418,20 @@ namespace Avocado.ViewModel
             }
         }
 
+        private CalendarItem selectedCalendarItem;
+        public CalendarItem SelectedCalendarItem
+        {
+            get
+            {
+                return selectedCalendarItem;
+            }
+            set
+            {
+                selectedCalendarItem = value;
+                RaisePropertyChanged("SelectedCalendarItem");
+            }
+        }
+
         public void SelectDate(DateTime date)
         {
 
@@ -396,6 +442,49 @@ namespace Avocado.ViewModel
             get
             {
                 return new RelayCommand<DateTime>(d => SelectDate(d));
+            }
+        }
+
+        #endregion
+
+        #region Media
+
+        public void AddPhoto()
+        {
+            // We need to run this async, but on the UI thread (... yeah, me either)
+            DispatcherHelper.CheckBeginInvokeOnUI(() => { PickPhoto(); });
+        }
+
+        public async void PickPhoto()
+        {
+            FileOpenPicker open = new FileOpenPicker();
+            open.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            open.ViewMode = PickerViewMode.Thumbnail;
+
+            // Filter to include a sample subset of file types
+            open.FileTypeFilter.Clear();
+            open.FileTypeFilter.Add(".bmp");
+            open.FileTypeFilter.Add(".png");
+            open.FileTypeFilter.Add(".jpeg");
+            open.FileTypeFilter.Add(".jpg");
+
+            // Open a stream for the selected file
+            StorageFile file = await open.PickSingleFileAsync();
+
+            // Ensure a file was selected
+            if (file != null)
+            {
+                var stream = await file.OpenAsync(FileAccessMode.Read);
+                Windows.Storage.Streams.Buffer buffer = new Windows.Storage.Streams.Buffer((uint)stream.Size);
+                await stream.ReadAsync(buffer, (uint)stream.Size, InputStreamOptions.None);
+            }
+        }
+
+        public ICommand AddPhotoCommand
+        {
+            get
+            {
+                return new RelayCommand(() => AddPhoto());
             }
         }
 
@@ -420,6 +509,7 @@ namespace Avocado.ViewModel
             activityList = AuthClient.GetActivities();
             listModelList = AuthClient.GetListModelList();
             calendarItems = AuthClient.GetCalendar();
+            mediaList = AuthClient.GetMedia();
             return;
         }
 
@@ -429,6 +519,7 @@ namespace Avocado.ViewModel
             ActivityList = activityList;
             ListModelList = listModelList;
             CalendarItems = calendarItems;
+            MediaList = mediaList;
             foreach (var activity in ActivityList)
             {
                 activity.User = activity.UserId == Couple.CurrentUser.Id ? Couple.CurrentUser : Couple.OtherUser;

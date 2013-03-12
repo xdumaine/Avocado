@@ -16,7 +16,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
+
+            <ProgressRing IsActive="True"/>
             <Image VerticalAlignment="Top" Source="{Binding Path=User.AvatarUrl}" Width="80" />
+
             <Grid Grid.Column="1" Margin="10,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -66,6 +69,25 @@
                                   HoverStateImageSource="../Assets/avo-delete-hover.png"
                                   PressedStateImageSource="../Assets/avo-delete-hover.png"
                                   Command="{Binding ElementName=ListDetail, Path=DataContext.DeleteListItemCommand}" CommandParameter="{Binding}"/>
+        </Grid>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="CalendarItem">
+        <Grid>
+            <Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="{Binding Title}"></TextBlock>
+                <TextBlock Text="{Binding Description}"></TextBlock>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="MediaListItem">
+        <Grid>
+            <Grid.ColumnDefinitions></Grid.ColumnDefinitions>
+            <ProgressRing IsActive="True"/>
+            <Image Source="{Binding Path=ImageUrls.Medium}"  Stretch="UniformToFill"/>
         </Grid>
     </DataTemplate>
     

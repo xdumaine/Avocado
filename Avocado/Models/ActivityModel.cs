@@ -25,7 +25,7 @@ namespace Avocado.DataModel
                 switch (Type)
                 {
                     case "message":
-                        return string.Format("sent you a message");
+                        return string.Format("sent a message");
                     case "list":
                         return string.Format("{0}ed the list '{1}'", Action, Data.Name);
                     case "kiss":
@@ -34,8 +34,10 @@ namespace Avocado.DataModel
                         return "hugged you!";
                     case "photo":
                         return "posted a photo";
+                    case "event":
+                        return string.Format("{0}ed the event: {1}", Action, Data.Name);
                     default:
-                        return "Did something I don't know about";
+                        return "Did something I don't know about - " + Type;
                 }
             }
         }
@@ -168,6 +170,18 @@ namespace Avocado.DataModel
         public double AspectRatio { get; set; }
         public string Format { get; set; }
         public long size { get; set; }
+    }
+
+    public class MediaModel
+    {
+        public string Id { get; set; }
+        public string Caption { get; set; }
+        public string Url { get; set; }
+        public long TimeCreated { get; set; }
+        public long TimeUpdated { get; set; }
+        public string FileName { get; set; }
+        public ImageUrlCollection ImageUrls { get; set; }
+        public PhotoInfo Info { get; set; }
     }
 
     public class ListModel

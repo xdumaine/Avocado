@@ -22,7 +22,6 @@
     </Application>
   </Applications>
   <Capabilities>
-    <Capability Name="picturesLibrary" />
     <Capability Name="privateNetworkClientServer" />
     <Capability Name="internetClientServer" />
     <Capability Name="internetClient" />

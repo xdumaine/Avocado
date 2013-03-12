@@ -24,6 +24,7 @@ namespace Avocado.DataModel
         private static string API_URL_LISTS = API_URL_BASE + "lists/";
         private static string API_URL_CONVERSATION = API_URL_BASE + "conversation/";
         private static string API_URL_CALENDAR = API_URL_BASE + "calendar/";
+        private static string API_URL_MEDIA = API_URL_BASE + "media/";
         private static string COOKIE_NAME = "user_email";
         private static string USER_AGENT = "Avocado Windows 8 Client v.1.0";
         private static string ERROR_MSG = "\nFAILED.  Signature was tested and failed. Try again and check the auth information.";
@@ -247,12 +248,16 @@ namespace Avocado.DataModel
             using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
             using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
             {
-                HttpContent body = new FormUrlEncodedContent(new[] { 
+                var body = new FormUrlEncodedContent(new[] { 
                     new KeyValuePair<string, string>("text", listItem.Text), 
                     new KeyValuePair<string, string>("complete", listItem.Complete ? "1" : "0"),
                     new KeyValuePair<string, string>("important", listItem.Important ? "1" : "0"),
                     new KeyValuePair<string, string>("index", index.ToString())
                 });
+                if (delete)
+                {
+                    body = new FormUrlEncodedContent(new KeyValuePair<string, string>[] { });
+                }
                 //create the new request
                 var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id + (delete ? "/delete" : ""));
                 client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
@@ -307,6 +312,53 @@ namespace Avocado.DataModel
                 client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
                 client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
                 cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+                var response = client.PostAsync(uri, body);
+
+                response.Result.EnsureSuccessStatusCode();
+
+            }
+        }
+
+        public List<MediaModel> GetMedia()
+        {
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                //create the new request
+                var uri = new Uri(API_URL_MEDIA);
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+                var response = client.GetAsync(uri);
+                response.Result.EnsureSuccessStatusCode();
+                var responseText = response.Result.Content.ReadAsStringAsync().Result;
+
+                var settings = new Newtonsoft.Json.JsonSerializerSettings();
+                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
+                var media = JsonConvert.DeserializeObject<List<MediaModel>>(responseText, settings);
+
+                return media;
+            }
+        }
+
+        public void UploadPhoto(string photoContents)
+        {
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                HttpContent body = new FormUrlEncodedContent(new[] { 
+                    new KeyValuePair<string, string>("media", photoContents)
+                });
+                //create the new request
+                var uri = new Uri(API_URL_MEDIA);
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+                
                 var response = client.PostAsync(uri, body);
 
                 response.Result.EnsureSuccessStatusCode();

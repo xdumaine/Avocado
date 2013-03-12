@@ -5,6 +5,8 @@ using System.Linq;
 using Avocado.DataModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -44,6 +46,11 @@ namespace Avocado.Views
             var context = (Avocado.ViewModel.Activities)this.DataContext;
             context.AuthClient = (AuthClient)navigationParameter;
             context.Update();
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            
         }
 
     }

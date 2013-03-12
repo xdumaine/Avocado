@@ -25,7 +25,10 @@
     -->
     <Page.BottomAppBar>
         <AppBar>
-            <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding RefreshCommand}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding RefreshCommand}"/>
+                <Button Style="{StaticResource UploadAppBarButtonStyle}" Command="{Binding AddPhotoCommand}" Visibility="{Binding IsMediaTabActive,Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </StackPanel>
         </AppBar>
     </Page.BottomAppBar>
     <Grid Style="{StaticResource LayoutRootStyle}">
@@ -38,22 +41,14 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <!-- Back button and page title -->
         <ProgressBar IsIndeterminate="True" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.ColumnSpan="3" VerticalAlignment="Top" Margin="0,10,0,0" />
-        <Grid x:Name="titlePanel">
+        <Grid x:Name="titlePanel" Margin="10,0,0,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button
-                x:Name="backButton"
-                Command="{Binding RefreshCommand}"
-                IsEnabled="{Binding DefaultViewModel.CanGoBack, ElementName=pageRoot}"
-                Style="{StaticResource BackButtonStyle}">
-            </Button>
-            <Image Source="{Binding Path=Couple.CurrentUser.AvatarUrl, Mode=TwoWay}" Height="80" Width="80" Grid.Column="1"/>
-            <controls:WatermarkTextBox TextWrapping="Wrap" WatermarkText="{Binding NewMessagePrompt}" Text="{Binding NewMessage, Mode=TwoWay}" Grid.Column="2" Margin="20,40,0,40">
+            <Image Source="{Binding Path=Couple.CurrentUser.AvatarUrl, Mode=TwoWay}" Height="100" Width="100" Grid.Column="0"/>
+            <controls:WatermarkTextBox TextWrapping="Wrap" WatermarkText="{Binding NewMessagePrompt}" Text="{Binding NewMessage, Mode=TwoWay}" Grid.Column="1" Margin="20,40,0,40">
                 <WinRtBehaviors:Interaction.Behaviors>
                     <Behaviors:EventToCommandBehavior Event="KeyDown" Command="NewMessageKeyDownCommand" PassEventArgsToCommand="True" />
                 </WinRtBehaviors:Interaction.Behaviors>
@@ -95,12 +90,12 @@
                            Visibility="{Binding Path=IsCalendarTabActive, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 </Grid>
             </Button>
-            <Button Command="{Binding SetPhotoTabActiveCommand}" Height="100" Width="100">
+            <Button Command="{Binding SetMediaTabActiveCommand}" Height="100" Width="100">
                 <Grid>
                     <Image Source="../Assets/avo-photos-active.png"
-                           Visibility="{Binding Path=IsPhotoTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                           Visibility="{Binding Path=IsMediaTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <Image Source="../Assets/avo-photos.png"
-                           Visibility="{Binding Path=IsPhotoTabActive, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                           Visibility="{Binding Path=IsMediaTabActive, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 </Grid>
             </Button>
             <Button Command="{Binding SetPreferenceTabActiveCommand}" Height="100" Width="100">
@@ -125,6 +120,18 @@
                   ItemContainerStyle="{StaticResource AvoListViewItemStyle}"
                   Visibility="{Binding IsListTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         
+        <ListView Name="CalendarList" HorizontalContentAlignment="Stretch" Grid.Row="1" Margin="120,0,0,60"
+                  ItemsSource="{Binding CalendarItems}" ItemTemplate="{StaticResource CalendarItem}"
+                  SelectedItem="{Binding SelectedCalendarItem, Mode=TwoWay}"
+                  ItemContainerStyle="{StaticResource AvoListViewItemStyle}"
+                  Visibility="{Binding IsCalendarTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        
+        <ListView Name="PhotoList" HorizontalContentAlignment="Stretch" Grid.Row="1" Margin="120,0,0,60"
+                  ItemsSource="{Binding MediaList}" ItemTemplate="{StaticResource MediaListItem}"
+                  SelectedItem="{Binding SelectedMediaListItem, Mode=TwoWay}"
+                  ItemContainerStyle="{StaticResource AvoListViewItemStyle}"
+                  Visibility="{Binding IsMediaTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        
         <Grid Name="ActivityDetail" Margin="20,0,20,0" Grid.Row="2" Grid.Column="1"
               Visibility="{Binding IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
@@ -137,13 +144,15 @@
                    Source="{Binding Path=SelectedActivity.Data.Url}"/>
         </Grid>
         
-        <Grid Name="ListDetail" Margin="20,0,20,0" Grid.Row="2" Grid.Column="1" 
+        <Grid Name="ListDetail" Margin="20,0,20,0" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" 
               Visibility="{Binding IsListTabActive, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
+                <RowDefinition Height="140"/>
                 <RowDefinition Height="90"/>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <controls:WatermarkTextBox WatermarkText="+ Add a new item" Text="{Binding NewListItemText, Mode=TwoWay}">
+            <TextBlock Style="{StaticResource PageHeaderTextStyle}" Text="{Binding Path=SelectedListModel.Name}"/>
+            <controls:WatermarkTextBox Grid.Row="1" FontSize="20" Height="50" WatermarkText="+ Add a new item" Text="{Binding NewListItemText, Mode=TwoWay}">
                 <WinRtBehaviors:Interaction.Behaviors>
                     <Behaviors:EventToCommandBehavior Event="KeyDown" Command="NewListItemKeyDownCommand" PassEventArgsToCommand="True" />
                 </WinRtBehaviors:Interaction.Behaviors>
@@ -162,6 +171,16 @@
             <Win8Controls:Calendar ShowSelectedDate="True" Grid.Row="0" CalendarItemStyle="{StaticResource AvoCalendarItemStyle}" 
                                    DatePropertyNameForDatesSource="StartDate" SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
                                    SelectedDateCommand="{Binding SelectDateCommand}" DatesSource="{Binding CalendarItems}"  />
+        </Grid>
+
+        <Grid Name="MediaDetail" Visibility="{Binding IsMediaTabActive, Converter={StaticResource BooleanToVisibilityConverter}}" 
+              Margin="20,60,20,0" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Image Source="{Binding Path=SelectedMediaListItem.Url}" Grid.Row="0"/>
+            <TextBlock Text="{Binding Path=SelectedMediaListItem.Caption}" Grid.Row="1" HorizontalAlignment="Center" FontSize="60" Margin="10" FontWeight="Light" TextWrapping="Wrap" TextAlignment="Center"/>
         </Grid>
     </Grid>
 </common:LayoutAwarePage>
