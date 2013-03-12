@@ -112,163 +112,131 @@ namespace Avocado.Models
             return true;
         }
 
-        public Couple GetUsers()
+        #region DataAccessHelpers
+
+        private HttpResponseMessage Post(Uri uri, FormUrlEncodedContent body)
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
             using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
             using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
             {
-                //create the new request
-                var uri = new Uri(API_URL_COUPLE);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-
-                var status2 = response.Result.StatusCode;
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var couple = JsonConvert.DeserializeObject<Couple>(responseText);
-                return couple;
-            }
-        }
-
-        public List<Activity> GetActivities()
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                //create the new request
-                var uri = new Uri(API_URL_ACTIVITIES);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-
-                var status2 = response.Result.StatusCode;
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var settings = new Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var activities = JsonConvert.DeserializeObject<List<Activity>>(responseText, settings);
-
-                return activities;
-            }
-        }
-
-        public AvoList GetList(string listId)
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                //create the new request
-                var uri = new Uri(API_URL_LISTS + listId);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-
-                var status2 = response.Result.StatusCode;
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var settings = new Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var activities = JsonConvert.DeserializeObject<AvoList>(responseText, settings);
-
-                return activities;
-            }
-        }
-
-        public List<AvoList> GetListModelList()
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                //create the new request
-                var uri = new Uri(API_URL_LISTS);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-
-                var status2 = response.Result.StatusCode;
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var settings = new Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var lists = JsonConvert.DeserializeObject<List<AvoList>>(responseText, settings);
-
-                foreach (var list in lists)
-                {
-                    foreach (var item in list.Items)
-                    {
-                        item.ListId = list.Id;
-                    }
-                }
-
-                return lists;
-            }
-        }
-
-        public ObservableCollection<CalendarItem> GetCalendar()
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                //create the new request
-                var uri = new Uri(API_URL_CALENDAR + "?days=120");
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-
-                response.Result.EnsureSuccessStatusCode();
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var settings = new Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var calendarItems = JsonConvert.DeserializeObject<ObservableCollection<CalendarItem>>(responseText, settings);
-
-                return calendarItems;
-            }
-        }
-
-        public void EditListItem(AvoListItem listItem, int index, bool delete = false)
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                var body = new FormUrlEncodedContent(new[] { 
-                    new KeyValuePair<string, string>("text", listItem.Text), 
-                    new KeyValuePair<string, string>("complete", listItem.Complete ? "1" : "0"),
-                    new KeyValuePair<string, string>("important", listItem.Important ? "1" : "0"),
-                    new KeyValuePair<string, string>("index", index.ToString())
-                });
-                if (delete)
-                {
-                    body = new FormUrlEncodedContent(new KeyValuePair<string, string>[] { });
-                }
-                //create the new request
-                var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id + (delete ? "/delete" : ""));
                 client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
                 client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
                 cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
                 var response = client.PostAsync(uri, body);
 
-                response.Result.EnsureSuccessStatusCode();
+                return response.Result;
 
             }
+        }
+
+        private HttpResponseMessage Get(Uri uri)
+        {
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+
+                var response = client.GetAsync(uri);
+                return response.Result;
+            }
+        }
+        
+        #endregion
+
+        #region GetData
+
+        public Couple GetUsers()
+        {
+            var uri = new Uri(API_URL_COUPLE);
+            var response = Get(uri);
+            response.EnsureSuccessStatusCode();
+
+            var couple = JsonConvert.DeserializeObject<Couple>(response.Content.ReadAsStringAsync().Result);
+            return couple;
+        }
+
+        public List<Activity> GetActivities()
+        {
+            var uri = new Uri(API_URL_ACTIVITIES);
+            var response = Get(uri);
+            response.EnsureSuccessStatusCode();
+            
+            var activities = JsonConvert.DeserializeObject<List<Activity>>(response.Content.ReadAsStringAsync().Result);
+            return activities;
+        }
+
+        public AvoList GetList(string listId)
+        {
+
+            var uri = new Uri(API_URL_LISTS + listId);
+            var response = Get(uri);
+            response.EnsureSuccessStatusCode();
+
+            var list = JsonConvert.DeserializeObject<AvoList>(response.Content.ReadAsStringAsync().Result);
+            return list;
+        }
+
+        public List<AvoList> GetListModelList()
+        {
+            var uri = new Uri(API_URL_LISTS);
+            var response = Get(uri);
+
+            var lists = JsonConvert.DeserializeObject<List<AvoList>>(response.Content.ReadAsStringAsync().Result);
+            foreach (var list in lists)
+            {
+                foreach (var item in list.Items)
+                {
+                    item.ListId = list.Id;
+                }
+            }
+
+            return lists;
+        }
+
+        public ObservableCollection<CalendarItem> GetCalendar()
+        {
+            var uri = new Uri(API_URL_CALENDAR + "?days=120");
+            var response = Get(uri);
+
+            var calendarItems = JsonConvert.DeserializeObject<ObservableCollection<CalendarItem>>(response.Content.ReadAsStringAsync().Result);
+            return calendarItems;
+        }
+
+        public List<Media> GetMedia()
+        {
+            var uri = new Uri(API_URL_MEDIA);
+            var response = Get(uri);
+            response.EnsureSuccessStatusCode();
+
+            var media = JsonConvert.DeserializeObject<List<Media>>(response.Content.ReadAsStringAsync().Result);
+            return media;
+        }
+
+        #endregion
+
+        #region EditData
+
+        public void EditListItem(AvoListItem listItem, int index, bool delete = false)
+        {
+            var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id + (delete ? "/delete" : ""));
+            var body = new FormUrlEncodedContent(new[] { 
+                    new KeyValuePair<string, string>("text", listItem.Text), 
+                    new KeyValuePair<string, string>("complete", listItem.Complete ? "1" : "0"),
+                    new KeyValuePair<string, string>("important", listItem.Important ? "1" : "0"),
+                    new KeyValuePair<string, string>("index", index.ToString())
+                });
+            if (delete)
+            {
+                body = new FormUrlEncodedContent(new KeyValuePair<string, string>[] { });
+            }
+            var response = Post(uri, body);
+            response.EnsureSuccessStatusCode();
         }
 
         public void CreateListItem(string listItemText, string listId, int index)
@@ -277,94 +245,38 @@ namespace Avocado.Models
             {
                 return;
             }
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                HttpContent body = new FormUrlEncodedContent(new[] { 
-                    new KeyValuePair<string, string>("text", listItemText),
-                    new KeyValuePair<string, string>("index", index.ToString())
-                });
-                //create the new request
-                var uri = new Uri(API_URL_LISTS + listId);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.PostAsync(uri, body);
 
-                response.Result.EnsureSuccessStatusCode();
-
-            }
+            var uri = new Uri(API_URL_LISTS + listId);
+            var body = new FormUrlEncodedContent(new[] { 
+                new KeyValuePair<string, string>("text", listItemText),
+                new KeyValuePair<string, string>("index", index.ToString())
+            });
+            var response = Post(uri, body);
+            response.EnsureSuccessStatusCode();
         }
 
         public void SendMessage(string message)
         {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                HttpContent body = new FormUrlEncodedContent(new[] { 
-                    new KeyValuePair<string, string>("message", message)
-                });
-                //create the new request
-                var uri = new Uri(API_URL_CONVERSATION);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.PostAsync(uri, body);
+            var uri = new Uri(API_URL_CONVERSATION);
+            var body = new FormUrlEncodedContent(new[] { 
+                new KeyValuePair<string, string>("message", message)
+            });
 
-                response.Result.EnsureSuccessStatusCode();
-
-            }
-        }
-
-        public List<Media> GetMedia()
-        {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                //create the new request
-                var uri = new Uri(API_URL_MEDIA);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                var response = client.GetAsync(uri);
-                response.Result.EnsureSuccessStatusCode();
-                var responseText = response.Result.Content.ReadAsStringAsync().Result;
-
-                var settings = new Newtonsoft.Json.JsonSerializerSettings();
-                settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var media = JsonConvert.DeserializeObject<List<Media>>(responseText, settings);
-
-                return media;
-            }
+            var response = Post(uri, body);
+            response.EnsureSuccessStatusCode();
         }
 
         public void UploadPhoto(string photoContents)
         {
-            var baseAddress = new Uri(API_URL_BASE);
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                HttpContent body = new FormUrlEncodedContent(new[] { 
-                    new KeyValuePair<string, string>("media", photoContents)
-                });
-                //create the new request
-                var uri = new Uri(API_URL_MEDIA);
-                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
-                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
-                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
-                
-                var response = client.PostAsync(uri, body);
+            var uri = new Uri(API_URL_MEDIA);
+            var body = new FormUrlEncodedContent(new[] { 
+                new KeyValuePair<string, string>("media", photoContents)
+            });
 
-                response.Result.EnsureSuccessStatusCode();
-
-            }
+            var response = Post(uri, body);
+            response.EnsureSuccessStatusCode();
         }
+
+        #endregion
     }
 }
