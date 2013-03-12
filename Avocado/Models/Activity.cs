@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Avocado.ViewModel;
 using MetroMVVM;
 
-namespace Avocado.DataModel
+namespace Avocado.Models
 {
     public class Activity
     {
@@ -114,7 +114,7 @@ namespace Avocado.DataModel
 
         public ActivityData Data { get; set; }
 
-        public UserModel User { get; set; }
+        public User User { get; set; }
     }
 
     // Comments above each item specify which activity type they are used in
@@ -148,240 +148,19 @@ namespace Avocado.DataModel
         public string Attribute { get; set; }
     }
 
-    public class ImageUrlCollection
-    {
-        public string Tiny { get; set; }
-        public string Small { get; set; }
-        public string Medium { get; set; }
-        public string Large { get; set; }
-    }
+    
 
-    public class Kiss
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Rotation { get; set; }
-    }
+    
 
-    public class PhotoInfo
-    {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public double AspectRatio { get; set; }
-        public string Format { get; set; }
-        public long size { get; set; }
-    }
+    
 
-    public class MediaModel
-    {
-        public string Id { get; set; }
-        public string Caption { get; set; }
-        public string Url { get; set; }
-        public long TimeCreated { get; set; }
-        public long TimeUpdated { get; set; }
-        public string FileName { get; set; }
-        public ImageUrlCollection ImageUrls { get; set; }
-        public PhotoInfo Info { get; set; }
-    }
+    
 
-    public class ListModel
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public long TimeCreated { get; set; }
-        public long TimeUpdated { get; set; }
-        public ObservableCollection<ListItemModel> Items { get; set; }
-        
-    }
+    
 
-    public class ListItemModel : ObservableObject
-    {
-        #region Observables
+    
 
-        private bool complete;
-        public bool Complete 
-        {
-            get
-            {
-                return complete;
-            }
-            set
-            {
-                complete = value;
-                RaisePropertyChanged("Complete");
-            }
-        }
-
-        private string text;
-        public string Text { get { return text; } set { text = value; RaisePropertyChanged("Text"); } }
-
-        private bool important;
-        public bool Important { get { return important; } set { important = value; RaisePropertyChanged("Important"); } }
-
-        #endregion
-
-        public string Id { get; set; }
-        public string ListId { get; set; }
-        public string UserId { get; set; }
-        public ImageUrlCollection ImageUrls { get; set; }
-        public PhotoInfo ImageInfo { get; set; }
-    }
-
-    public class CalendarItem : ObservableObject
-    {
-        public string Id;
-        public string userId;
-        public double StartTime;
-        public double EndTime;
-        public double TimeCreated;
-        public double TimeUpdated;
-
-        private string title;
-        public string Title
-        {
-            get
-            {
-                return title;
-            }
-            set
-            {
-                title = value;
-                RaisePropertyChanged("Title");
-            }
-        }
-
-        private string description;
-        public string Description
-        {
-            get
-            {
-                return description;
-            }
-            set
-            {
-                description = value;
-                RaisePropertyChanged("Description");
-            }
-        }
-
-        private DateTime startDate;
-        public DateTime StartDate
-        {
-            get
-            {
-                if (startDate == null || startDate == DateTime.MinValue)
-                {
-                    StartDate = (Utilities.UnixTimeStampToDateTime(StartTime)).Date;
-                }
-                return startDate;
-            }
-            set
-            {
-                startDate = value;
-                RaisePropertyChanged("StartDateTime");
-            }
-        }
-
-        private DateTime endDateTime;
-        public DateTime EndDateTime
-        {
-            get
-            {
-                if (endDateTime == null || endDateTime == DateTime.MinValue)
-                {
-                    endDateTime = Utilities.UnixTimeStampToDateTime(EndTime);
-                }
-                return endDateTime;
-            }
-        }
-
-        private DateTime dateTimeCreated;
-        public DateTime DateTimeCreated
-        {
-            get
-            {
-                if (dateTimeCreated == null || dateTimeCreated == DateTime.MinValue)
-                {
-                    dateTimeCreated = Utilities.UnixTimeStampToDateTime(TimeCreated);
-                }
-                return dateTimeCreated;
-            }
-        }
-
-        private DateTime dateTimeUpdated;
-        public DateTime DateTimeUpdated
-        {
-            get
-            {
-                if (dateTimeUpdated == null || dateTimeUpdated == DateTime.MinValue)
-                {
-                    dateTimeUpdated = Utilities.UnixTimeStampToDateTime(TimeUpdated);
-                }
-                return dateTimeUpdated;
-            }
-        }
-
-        private string location;
-        public string Location
-        {
-            get
-            {
-                return location;
-            }
-            set
-            {
-                location = value;
-                RaisePropertyChanged("Location");
-            }
-        }
-
-        private List<string> attending;
-        public List<string> Attending
-        {
-            get
-            {
-                return attending;
-            }
-            set
-            {
-                attending = value;
-                RaisePropertyChanged("Attending");
-            }
-        }
-
-
-        public ObservableCollection<Reminder> Reminders;
-
-        private string recurrenceType;
-        public string RecurrenceType
-        {
-            get
-            {
-                return recurrenceType;
-            }
-            set
-            {
-                recurrenceType = value;
-                RaisePropertyChanged("RecurrenceType");
-            }
-        }
-
-        public string indicator;
-        public string Indicator { get { return indicator; } set { indicator = value; RaisePropertyChanged("Indicator"); } }
-
-        public CalendarItem()
-        {
-            Indicator = "•";
-        }
-    }
-
-    public class Reminder
-    {
-        string Id;
-        string UserId;
-        string Type;
-        double Interval;
-    }
+    
 
 
 

@@ -11,7 +11,7 @@ using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Net;
-using Avocado.DataModel;
+using Avocado.Models;
 using MetroMVVM.Interfaces;
 
 namespace Avocado.ViewModel

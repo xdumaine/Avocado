@@ -10,8 +10,9 @@ using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using Avocado.ViewModels;
 
-namespace Avocado.DataModel
+namespace Avocado.Models
 {
 
     class AuthClient
@@ -111,7 +112,7 @@ namespace Avocado.DataModel
             return true;
         }
 
-        public CoupleModel GetUsers()
+        public Couple GetUsers()
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -128,7 +129,7 @@ namespace Avocado.DataModel
                 var status2 = response.Result.StatusCode;
                 var responseText = response.Result.Content.ReadAsStringAsync().Result;
 
-                var couple = JsonConvert.DeserializeObject<CoupleModel>(responseText);
+                var couple = JsonConvert.DeserializeObject<Couple>(responseText);
                 return couple;
             }
         }
@@ -158,7 +159,7 @@ namespace Avocado.DataModel
             }
         }
 
-        public ListModel GetList(string listId)
+        public AvoList GetList(string listId)
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -177,13 +178,13 @@ namespace Avocado.DataModel
 
                 var settings = new Newtonsoft.Json.JsonSerializerSettings();
                 settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var activities = JsonConvert.DeserializeObject<ListModel>(responseText, settings);
+                var activities = JsonConvert.DeserializeObject<AvoList>(responseText, settings);
 
                 return activities;
             }
         }
 
-        public List<ListModel> GetListModelList()
+        public List<AvoList> GetListModelList()
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -202,7 +203,7 @@ namespace Avocado.DataModel
 
                 var settings = new Newtonsoft.Json.JsonSerializerSettings();
                 settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var lists = JsonConvert.DeserializeObject<List<ListModel>>(responseText, settings);
+                var lists = JsonConvert.DeserializeObject<List<AvoList>>(responseText, settings);
 
                 foreach (var list in lists)
                 {
@@ -241,7 +242,7 @@ namespace Avocado.DataModel
             }
         }
 
-        public void EditListItem(ListItemModel listItem, int index, bool delete = false)
+        public void EditListItem(AvoListItem listItem, int index, bool delete = false)
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -319,7 +320,7 @@ namespace Avocado.DataModel
             }
         }
 
-        public List<MediaModel> GetMedia()
+        public List<Media> GetMedia()
         {
             var baseAddress = new Uri(API_URL_BASE);
             var cookieContainer = new CookieContainer();
@@ -337,7 +338,7 @@ namespace Avocado.DataModel
 
                 var settings = new Newtonsoft.Json.JsonSerializerSettings();
                 settings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects;
-                var media = JsonConvert.DeserializeObject<List<MediaModel>>(responseText, settings);
+                var media = JsonConvert.DeserializeObject<List<Media>>(responseText, settings);
 
                 return media;
             }

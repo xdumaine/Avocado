@@ -7,7 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avocado.DataModel;
+using Avocado.Models;
+using Avocado.ViewModels;
 using MetroMVVM;
 using MetroMVVM.Commands;
 using MetroMVVM.Threading;
@@ -35,23 +36,23 @@ namespace Avocado.ViewModel
     {
         public AuthClient AuthClient { get; set; }
 
-        private CoupleModel couple;
-        public CoupleModel Couple { get { return couple; } set { couple = value; RaisePropertyChanged("Couple"); RaisePropertyChanged("NewMessagePrompt"); } }
+        private Couple couple;
+        public Couple Couple { get { return couple; } set { couple = value; RaisePropertyChanged("Couple"); RaisePropertyChanged("NewMessagePrompt"); } }
 
         private List<Activity> activityList;
         public List<Activity> ActivityList { get { return activityList; } set { activityList = value; RaisePropertyChanged("ActivityList"); } }
 
-        private List<ListModel> listModelList;
-        public List<ListModel> ListModelList { get { return listModelList; } set { listModelList = value; RaisePropertyChanged("ListModelList"); } }
+        private List<AvoList> listModelList;
+        public List<AvoList> ListModelList { get { return listModelList; } set { listModelList = value; RaisePropertyChanged("ListModelList"); } }
 
-        private List<MediaModel> mediaList;
-        public List<MediaModel> MediaList { get { return mediaList; } set { mediaList = value; RaisePropertyChanged("MediaList"); } }
+        private List<Media> mediaList;
+        public List<Media> MediaList { get { return mediaList; } set { mediaList = value; RaisePropertyChanged("MediaList"); } }
 
-        public MediaModel selectedMediaListItem;
-        public MediaModel SelectedMediaListItem { get { return selectedMediaListItem; } set { selectedMediaListItem = value; RaisePropertyChanged("SelectedMediaListItem"); } }
+        public Media selectedMediaListItem;
+        public Media SelectedMediaListItem { get { return selectedMediaListItem; } set { selectedMediaListItem = value; RaisePropertyChanged("SelectedMediaListItem"); } }
         
-        private ListModel selectedListModel;
-        public ListModel SelectedListModel { 
+        private AvoList selectedListModel;
+        public AvoList SelectedListModel { 
             get 
             { 
                 return selectedListModel; 
@@ -77,7 +78,7 @@ namespace Avocado.ViewModel
         {
             if (y.Action == NotifyCollectionChangedAction.Add)
             {
-                EditListItem(((ObservableCollection<ListItemModel>)t)[y.NewStartingIndex], false, y.NewStartingIndex);
+                EditListItem(((ObservableCollection<AvoListItem>)t)[y.NewStartingIndex], false, y.NewStartingIndex);
             }
             return t;
         }
@@ -171,7 +172,7 @@ namespace Avocado.ViewModel
 
         #region ListItemActions
 
-        public void EditListItem(ListItemModel listItem, bool delete = false, int index = -1)
+        public void EditListItem(AvoListItem listItem, bool delete = false, int index = -1)
         {
             if (string.IsNullOrEmpty(listItem.ListId))
             {
@@ -200,11 +201,11 @@ namespace Avocado.ViewModel
         {
             get
             {
-                return new RelayCommand<ListItemModel>(param => EditListItem(param));
+                return new RelayCommand<AvoListItem>(param => EditListItem(param));
             }
         }
 
-        public void ToggleListItemImportant(ListItemModel listItem)
+        public void ToggleListItemImportant(AvoListItem listItem)
         {
             listItem.Important = !listItem.Important;
             EditListItem(listItem);
@@ -214,7 +215,7 @@ namespace Avocado.ViewModel
         {
             get
             {
-                return new RelayCommand<ListItemModel>(param => { ToggleListItemImportant(param); });
+                return new RelayCommand<AvoListItem>(param => { ToggleListItemImportant(param); });
             }
         }
 
@@ -222,7 +223,7 @@ namespace Avocado.ViewModel
         {
             get
             {
-                return new RelayCommand<ListItemModel>(param => EditListItem(param, true));
+                return new RelayCommand<AvoListItem>(param => EditListItem(param, true));
             }
         }
 
@@ -248,7 +249,7 @@ namespace Avocado.ViewModel
                 {
                     IsLoading = true;
                     var index = GetListItemIndex(SelectedListModel, false, false);
-                    SelectedListModel.Items.Insert(index, new ListItemModel() { Text = NewListItemText });
+                    SelectedListModel.Items.Insert(index, new AvoListItem() { Text = NewListItemText });
                     var clone = NewListItemText;
                     var task = ThreadPool.RunAsync(t => AuthClient.CreateListItem(clone, SelectedListModel.Id, index));
 
@@ -267,7 +268,7 @@ namespace Avocado.ViewModel
             }
         }
 
-        public int GetListItemIndex(ListModel list, bool complete, bool important)
+        public int GetListItemIndex(AvoList list, bool complete, bool important)
         {
             if (important && !complete) // important and not complete, just add it to the beginning of the list
             {
