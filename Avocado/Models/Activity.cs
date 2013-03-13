@@ -64,6 +64,13 @@ namespace Avocado.Models
                 return Type == "message";
             }
         }
+        public bool IsEvent
+        {
+            get
+            {
+                return Type == "event";
+            }
+        }
         #endregion
 
         public DateTime date;

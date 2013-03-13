@@ -27,7 +27,8 @@
         <AppBar>
             <StackPanel Orientation="Horizontal">
                 <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding RefreshCommand}"/>
-                <Button Style="{StaticResource UploadAppBarButtonStyle}" Command="{Binding AddPhotoCommand}" Visibility="{Binding IsMediaTabActive,Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Style="{StaticResource UploadPhotoAppBarButtonStyle}" Command="{Binding AddPhotoCommand}" Visibility="{Binding IsMediaTabActive,Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Button Style="{StaticResource ClearAppBarButtonStyle}" Command="{Binding ClearListActivitiesCommand}" Visibility="{Binding IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </StackPanel>
         </AppBar>
     </Page.BottomAppBar>

@@ -45,10 +45,9 @@ namespace MetroMVVM
         {
             MessageDialog msg = new MessageDialog(message, caption);
 
-            Windows.ApplicationModel.Resources.ResourceLoader rl = new Windows.ApplicationModel.Resources.ResourceLoader();
             try
             {
-                m_OkString = rl.GetString("OK");
+                m_OkString = "OK";
             }
             catch (Exception)
             {
@@ -57,7 +56,7 @@ namespace MetroMVVM
 
             try
             {
-                m_CancelString = rl.GetString("Cancel");
+                m_CancelString = "Cancel";
             }
             catch (Exception)
             {

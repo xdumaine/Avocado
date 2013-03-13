@@ -277,6 +277,15 @@ namespace Avocado.Models
             response.EnsureSuccessStatusCode();
         }
 
+        public void DeleteActivity(string id)
+        {
+            var uri = new Uri(string.Format("{0}/{1}/delete", API_URL_ACTIVITIES, id));
+            var body = new FormUrlEncodedContent(new KeyValuePair<string, string>[] { });
+            
+            var response = Post(uri, body);
+            response.EnsureSuccessStatusCode();
+        }
+
         #endregion
     }
 }

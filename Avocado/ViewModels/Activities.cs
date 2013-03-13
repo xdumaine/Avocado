@@ -494,6 +494,47 @@ namespace Avocado.ViewModel
         public Activities()
         {
             DispatcherHelper.Initialize();
+            
+        }
+
+        public void ClearListActivities()
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(ConfirmClearListActivities);
+        }
+
+        public async void ConfirmClearListActivities()
+        {
+            var messageBox = MessageBoxService.Default;
+
+            var result = await messageBox.ShowAsync("Are you sure you want to clear all activities about lists?", "Are you sure?", GenericMessageBoxButton.OkCancel);
+            if (result == GenericMessageBoxResult.Cancel)
+            {
+                return;
+            }
+
+            IsLoading = true;
+            var task = ThreadPool.RunAsync(t => ClearListActivitesAsync());
+
+            task.Completed = RunOnComplete(Update);
+        }
+
+        public async void ClearListActivitesAsync()
+        {
+            var listActivities = (from a in ActivityList
+                                   where a.IsList == true
+                                   select a).ToList();
+            foreach (var listActivity in listActivities)
+            {
+                AuthClient.DeleteActivity(listActivity.Id);
+            }
+        }
+
+        public ICommand ClearListActivitiesCommand
+        {
+            get
+            {
+                return new RelayCommand(() => { DispatcherHelper.CheckBeginInvokeOnUI(ClearListActivities); });
+            }
         }
 
         public AsyncActionCompletedHandler RunOnComplete(Action method)
