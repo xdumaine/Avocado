@@ -150,7 +150,17 @@ namespace Avocado.ViewModels
         }
 
         public string indicator;
-        public string Indicator { get { return indicator; } set { indicator = value; RaisePropertyChanged("Indicator"); } }
+        public string Indicator 
+        { 
+            get 
+            { 
+                return indicator; 
+            } 
+            set { 
+                indicator = value; 
+                RaisePropertyChanged("Indicator"); 
+            } 
+        }
 
         public CalendarItem()
         {

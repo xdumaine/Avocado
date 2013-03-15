@@ -116,6 +116,7 @@
     </Compile>
     <Compile Include="Common\GenericConverters.cs" />
     <Compile Include="Models\Activity.cs" />
+    <Compile Include="Models\ActivityData.cs" />
     <Compile Include="Models\AuthClient.cs" />
     <Compile Include="Models\AvoList.cs" />
     <Compile Include="Models\Couple.cs" />

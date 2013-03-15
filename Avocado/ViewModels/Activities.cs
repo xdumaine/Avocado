@@ -39,19 +39,75 @@ namespace Avocado.ViewModel
         public AuthClient AuthClient { get; set; }
 
         private Couple couple;
-        public Couple Couple { get { return couple; } set { couple = value; RaisePropertyChanged("Couple"); RaisePropertyChanged("NewMessagePrompt"); } }
+        public Couple Couple 
+        { 
+            get 
+            { 
+                return couple; 
+            } 
+            set 
+            { 
+                couple = value; 
+                RaisePropertyChanged("Couple"); 
+                RaisePropertyChanged("NewMessagePrompt"); 
+            } 
+        }
 
         private List<Activity> activityList;
-        public List<Activity> ActivityList { get { return activityList; } set { activityList = value; RaisePropertyChanged("ActivityList"); } }
+        public List<Activity> ActivityList 
+        { 
+            get 
+            { 
+                return activityList; 
+            } 
+            set 
+            { 
+                activityList = value; 
+                RaisePropertyChanged("ActivityList"); 
+            } 
+        }
 
         private List<AvoList> listModelList;
-        public List<AvoList> ListModelList { get { return listModelList; } set { listModelList = value; RaisePropertyChanged("ListModelList"); } }
+        public List<AvoList> ListModelList 
+        { 
+            get 
+            { 
+                return listModelList; 
+            } 
+            set 
+            { 
+                listModelList = value; 
+                RaisePropertyChanged("ListModelList"); 
+            } 
+        }
 
         private List<Media> mediaList;
-        public List<Media> MediaList { get { return mediaList; } set { mediaList = value; RaisePropertyChanged("MediaList"); } }
+        public List<Media> MediaList 
+        { 
+            get 
+            { 
+                return mediaList; 
+            } 
+            set 
+            { 
+                mediaList = value; 
+                RaisePropertyChanged("MediaList"); 
+            } 
+        }
 
         public Media selectedMediaListItem;
-        public Media SelectedMediaListItem { get { return selectedMediaListItem; } set { selectedMediaListItem = value; RaisePropertyChanged("SelectedMediaListItem"); } }
+        public Media SelectedMediaListItem 
+        { 
+            get 
+            { 
+                return selectedMediaListItem; 
+            } 
+            set 
+            { 
+                selectedMediaListItem = value; 
+                RaisePropertyChanged("SelectedMediaListItem"); 
+            } 
+        }
         
         private AvoList selectedListModel;
         public AvoList SelectedListModel { 
@@ -86,7 +142,18 @@ namespace Avocado.ViewModel
         }
 
         private string newMessage;
-        public string NewMessage { get { return newMessage; } set { newMessage = value; RaisePropertyChanged("NewMessage"); } }
+        public string NewMessage 
+        { 
+            get 
+            { 
+                return newMessage; 
+            } 
+            set 
+            { 
+                newMessage = value; 
+                RaisePropertyChanged("NewMessage"); 
+            } 
+        }
 
         public string NewMessagePrompt
         {
@@ -170,7 +237,17 @@ namespace Avocado.ViewModel
         }
 
         private bool isLoading;
-        public bool IsLoading { get { return isLoading; } set { isLoading = value; RaisePropertyChanged("IsLoading"); } }
+        public bool IsLoading 
+        { 
+            get 
+            { 
+                return isLoading; 
+            } set 
+            { 
+                isLoading = value; 
+                RaisePropertyChanged("IsLoading"); 
+            } 
+        }
 
         #region ListItemActions
 
@@ -403,8 +480,15 @@ namespace Avocado.ViewModel
         private ObservableCollection<CalendarItem> calendarItems;
         public ObservableCollection<CalendarItem> CalendarItems
         {
-            get { return calendarItems; }
-            set { calendarItems = value; RaisePropertyChanged("CalendarItems"); }
+            get 
+            { 
+                return calendarItems; 
+            }
+            set 
+            { 
+                calendarItems = value; 
+                RaisePropertyChanged("CalendarItems"); 
+            }
         }
 
         private DateTime selectedDate;

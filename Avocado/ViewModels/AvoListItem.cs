@@ -22,10 +22,32 @@ namespace Avocado.ViewModels
         }
 
         private string text;
-        public string Text { get { return text; } set { text = value; RaisePropertyChanged("Text"); } }
+        public string Text 
+        { 
+            get 
+            { 
+                return text; 
+            } 
+            set 
+            { 
+                text = value; 
+                RaisePropertyChanged("Text"); 
+            } 
+        }
 
         private bool important;
-        public bool Important { get { return important; } set { important = value; RaisePropertyChanged("Important"); } }
+        public bool Important 
+        { 
+            get 
+            { 
+                return important; 
+            } 
+            set 
+            { 
+                important = value; 
+                RaisePropertyChanged("Important"); 
+            } 
+        }
 
         #endregion
 

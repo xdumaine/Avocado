@@ -21,11 +21,6 @@ namespace Avocado.ViewModel
         public string Email { get; set; }
         public string Password { get; set; }
         public AuthClient AuthClient { get; set; }
-        
-
-        public Login()
-        {
-        }
 
         public void AttemptLogin()
         {
