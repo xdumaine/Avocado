@@ -11,6 +11,7 @@ using Avocado.Models;
 using Avocado.ViewModels;
 using MetroMVVM;
 using MetroMVVM.Commands;
+using MetroMVVM.NotificationsExtensions.TileContent;
 using MetroMVVM.Threading;
 using Windows.Foundation;
 using Windows.Storage;
@@ -18,6 +19,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.System;
 using Windows.System.Threading;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
 
@@ -475,9 +477,8 @@ namespace Avocado.ViewModel
             // Ensure a file was selected
             if (file != null)
             {
-                var stream = await file.OpenAsync(FileAccessMode.Read);
-                Windows.Storage.Streams.Buffer buffer = new Windows.Storage.Streams.Buffer((uint)stream.Size);
-                await stream.ReadAsync(buffer, (uint)stream.Size, InputStreamOptions.None);
+                var stream = file.OpenStreamForReadAsync().Result;
+                AuthClient.UploadPhoto(stream);
             }
         }
 
@@ -577,6 +578,23 @@ namespace Avocado.ViewModel
             //restore the selected tab in case restoring the selected list caused this to change
             SelectedTab = tab;
             IsLoading = false;
+
+            var message = (from a in ActivityList
+                           where a.IsMessage == true
+                           select a).FirstOrDefault();
+            
+            
+            var tileContent = TileContentFactory.CreateTileWideImageAndText01();
+            tileContent.Image.Src = message.User.AvatarUrl;
+            tileContent.TextCaptionWrap.Text = message.Data.Text;
+
+            var squareContent = TileContentFactory.CreateTileSquareText04();
+            squareContent.TextBodyWrap.Text = message.Data.Text;
+            tileContent.SquareContent = squareContent;
+            
+            TileNotification notification = tileContent.CreateNotification();
+            TileUpdater updater = TileUpdateManager.CreateTileUpdaterForApplication();
+            updater.Update(notification);
         }
 
         public void Update()

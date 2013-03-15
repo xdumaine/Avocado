@@ -169,6 +169,7 @@
     <Content Include="Assets\avo-prefs.png" />
     <Content Include="Assets\avo-star-empty.png" />
     <Content Include="Assets\avo-star-filled.png" />
+    <Content Include="Assets\Logo-310-150.png" />
     <Content Include="Assets\Logo.png" />
     <Content Include="Assets\SmallLogo.png" />
     <Content Include="Assets\SplashScreen.png" />

@@ -3,7 +3,7 @@
   <Identity Name="b93dacb5-f6d1-4293-9d2d-0d881104e44a" Publisher="CN=dumaine" Version="1.0.0.0" />
   <Properties>
     <DisplayName>Avocado</DisplayName>
-    <PublisherDisplayName>dumaine</PublisherDisplayName>
+    <PublisherDisplayName>Xander Dumaine</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Prerequisites>
@@ -16,7 +16,7 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Avocado.App">
       <VisualElements DisplayName="Avocado" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="Avocado" ForegroundText="light" BackgroundColor="#3E5828" ToastCapable="true">
-        <DefaultTile ShowName="allLogos" />
+        <DefaultTile ShowName="noLogos" WideLogo="Assets\logo-310-150.png" />
         <SplashScreen Image="Assets\SplashScreen.png" />
       </VisualElements>
     </Application>
