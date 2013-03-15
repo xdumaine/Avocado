@@ -578,23 +578,8 @@ namespace Avocado.ViewModel
             //restore the selected tab in case restoring the selected list caused this to change
             SelectedTab = tab;
             IsLoading = false;
+            SetLiveTile();
 
-            var message = (from a in ActivityList
-                           where a.IsMessage == true
-                           select a).FirstOrDefault();
-            
-            
-            var tileContent = TileContentFactory.CreateTileWideImageAndText01();
-            tileContent.Image.Src = message.User.AvatarUrl;
-            tileContent.TextCaptionWrap.Text = message.Data.Text;
-
-            var squareContent = TileContentFactory.CreateTileSquareText04();
-            squareContent.TextBodyWrap.Text = message.Data.Text;
-            tileContent.SquareContent = squareContent;
-            
-            TileNotification notification = tileContent.CreateNotification();
-            TileUpdater updater = TileUpdateManager.CreateTileUpdaterForApplication();
-            updater.Update(notification);
         }
 
         public void Update()
@@ -603,6 +588,47 @@ namespace Avocado.ViewModel
             var task = ThreadPool.RunAsync(t => UpdateData());
 
             task.Completed = RunOnComplete(ProcessUpdate);
+        }
+
+        public void SetLiveTile()
+        {
+            // get the first image, or the first message from the other user
+            var message = (from a in ActivityList
+                           where a.IsList == false && a.IsEvent == false
+                           && (a.IsMessage == false || a.User.Id != Couple.CurrentUser.Id)
+                           select a).FirstOrDefault();
+            
+            if (message.IsImage)
+            {
+                // TODO: use a different template if the image has a caption?
+                var tileContent = TileContentFactory.CreateTileWideImage();
+                tileContent.Image.Src = message.Data.ImageUrls.Small;
+
+                var squareContent = TileContentFactory.CreateTileSquareImage();
+                squareContent.Image.Src = message.Data.ImageUrls.Small;
+                tileContent.SquareContent = squareContent;
+                UpdateLiveTile(tileContent);
+            }
+            else if (message.IsMessage)
+            {
+                var tileContent = TileContentFactory.CreateTileWideImageAndText01();
+                tileContent.Image.Src = message.User.AvatarUrl;
+                tileContent.TextCaptionWrap.Text = message.Data.Text;
+
+                var squareContent = TileContentFactory.CreateTileSquareText04();
+                squareContent.TextBodyWrap.Text = message.Data.Text;
+                tileContent.SquareContent = squareContent;
+                UpdateLiveTile(tileContent);
+                
+            }
+        }
+
+        public void UpdateLiveTile(ITileNotificationContent tileContent)
+        {
+            TileNotification notification = tileContent.CreateNotification();
+            TileUpdater updater = TileUpdateManager.CreateTileUpdaterForApplication();
+            updater.Clear();
+            updater.Update(notification);
         }
 
 

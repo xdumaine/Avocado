@@ -25,8 +25,6 @@ namespace Avocado.ViewModel
 
         public Login()
         {
-            Email = "xander.dumaine@gmail.com";
-            Password = "T12lion20";
         }
 
         public void AttemptLogin()
