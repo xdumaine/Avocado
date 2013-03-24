@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avocado.Models;
@@ -16,12 +15,13 @@ using MetroMVVM.Threading;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.Storage.Streams;
 using Windows.System;
 using Windows.System.Threading;
+using Windows.UI;
 using Windows.UI.Notifications;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using WinRTXamlToolkit.Controls;
 
 namespace Avocado.ViewModel
 {
@@ -36,6 +36,24 @@ namespace Avocado.ViewModel
 
     class Activities : ObservableObject
     {
+        public static string PostButtonText = "Post";
+        public static string CancelPostButtonText = "Cancel Post";
+        public static SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
+        public static InputDialog CaptionDialog;
+
+
+        public Activities()
+        {
+            DispatcherHelper.Initialize();
+            
+            // Set up the Caption dialog. This will be re-used frequently 
+            CaptionDialog = new InputDialog();
+            CaptionDialog.BackgroundStripeBrush = AvocadoGreen;
+            CaptionDialog.Background = AvocadoGreen;
+            CaptionDialog.BorderBrush = new SolidColorBrush(Colors.Transparent);
+            CaptionDialog.AcceptButton = PostButtonText;
+            CaptionDialog.CancelButton = CancelPostButtonText;
+        }
         public AuthClient AuthClient { get; set; }
 
         private Couple couple;
@@ -112,7 +130,11 @@ namespace Avocado.ViewModel
         private AvoList selectedListModel;
         public AvoList SelectedListModel { 
             get 
-            { 
+            {
+                if (selectedListModel == null && ListModelList != null && ListModelList.Count > 0)
+                {
+                    SelectedListModel = ListModelList.First();
+                }
                 return selectedListModel; 
             } 
             set 
@@ -130,15 +152,6 @@ namespace Avocado.ViewModel
                 selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y)); 
                 RaisePropertyChanged("SelectedListModel"); 
             } 
-        }
-
-        private object ListItemDrop(object t, NotifyCollectionChangedEventArgs y)
-        {
-            if (y.Action == NotifyCollectionChangedAction.Add)
-            {
-                EditListItem(((ObservableCollection<AvoListItem>)t)[y.NewStartingIndex], false, y.NewStartingIndex);
-            }
-            return t;
         }
 
         private string newMessage;
@@ -250,6 +263,15 @@ namespace Avocado.ViewModel
         }
 
         #region ListItemActions
+
+        private object ListItemDrop(object t, NotifyCollectionChangedEventArgs y)
+        {
+            if (y.Action == NotifyCollectionChangedAction.Add)
+            {
+                EditListItem(((ObservableCollection<AvoListItem>)t)[y.NewStartingIndex], false, y.NewStartingIndex);
+            }
+            return t;
+        }
 
         public void EditListItem(AvoListItem listItem, bool delete = false, int index = -1)
         {
@@ -544,10 +566,11 @@ namespace Avocado.ViewModel
 
         public async void PickPhoto()
         {
+            IsLoading = true;
             FileOpenPicker open = new FileOpenPicker();
             open.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
             open.ViewMode = PickerViewMode.Thumbnail;
-
+            
             // Filter to include a sample subset of file types
             open.FileTypeFilter.Clear();
             open.FileTypeFilter.Add(".bmp");
@@ -559,11 +582,28 @@ namespace Avocado.ViewModel
             StorageFile file = await open.PickSingleFileAsync();
 
             // Ensure a file was selected
-            if (file != null)
+            
+            if (file == null)
             {
-                var stream = file.OpenStreamForReadAsync().Result;
-                AuthClient.UploadPhoto(stream);
+                IsLoading = false;
+                return;
             }
+            var stream = await file.OpenStreamForReadAsync();
+                
+            
+            var result = await CaptionDialog.ShowAsync("Caption?", "Totally optional", PostButtonText, CancelPostButtonText);
+            string captionResult = CaptionDialog.InputText;
+            CaptionDialog.InputText = string.Empty;
+            if (result == CancelPostButtonText) 
+            {
+                IsLoading = false;
+                return;
+            }
+            var task = ThreadPool.RunAsync(t => AuthClient.UploadPhoto(file.Name, file.ContentType, stream, captionResult));
+            task.Completed = RunOnComplete(Update);
+            //AuthClient.UploadPhoto(file.Name, file.ContentType, stream);
+            // ON UI Thread - we're here - do a confirm, then start the loading indicator, call an async operation to upload photo
+           
         }
 
         public ICommand AddPhotoCommand
@@ -575,12 +615,6 @@ namespace Avocado.ViewModel
         }
 
         #endregion
-
-        public Activities()
-        {
-            DispatcherHelper.Initialize();
-            
-        }
 
         public void ClearListActivities()
         {

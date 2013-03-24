@@ -11,6 +11,7 @@ using Windows.Security.Cryptography.Core;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using Avocado.ViewModels;
+using Windows.Storage.Streams;
 
 namespace Avocado.Models
 {
@@ -113,6 +114,24 @@ namespace Avocado.Models
         }
 
         #region DataAccessHelpers
+
+        private HttpResponseMessage PostBuffer(Uri uri, MultipartFormDataContent content)
+        {
+            var baseAddress = new Uri(API_URL_BASE);
+            var cookieContainer = new CookieContainer();
+            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+                client.DefaultRequestHeaders.Add("X-AvoSig", AvoSignature);
+                cookieContainer.Add(baseAddress, new Cookie(COOKIE_NAME, CookieValue));
+
+                var response = client.PostAsync(uri, content);
+
+                return response.Result;
+
+            }
+        }
 
         private HttpResponseMessage Post(Uri uri, FormUrlEncodedContent body)
         {
@@ -266,14 +285,20 @@ namespace Avocado.Models
             response.EnsureSuccessStatusCode();
         }
 
-        public void UploadPhoto(string photoContents)
+        public void UploadPhoto(string fileName, string contentType, System.IO.Stream photoContents, string caption = "")
         {
             var uri = new Uri(API_URL_MEDIA);
-            var body = new FormUrlEncodedContent(new[] { 
-                new KeyValuePair<string, string>("media", photoContents)
-            });
+            var content = new MultipartFormDataContent();
 
-            var response = Post(uri, body);
+            content.Add(new StringContent(caption), "\"caption\"");
+
+            var t = new StreamContent(photoContents);
+            t.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            fileName = string.IsNullOrEmpty(fileName) ? "img.png" : fileName;
+            content.Add(t, "\"media\"", "\"" + fileName + "\"");
+
+            var response = PostBuffer(uri, content);
+
             response.EnsureSuccessStatusCode();
         }
 
