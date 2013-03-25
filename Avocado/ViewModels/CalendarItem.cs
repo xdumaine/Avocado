@@ -132,6 +132,23 @@ namespace Avocado.ViewModels
             }
         }
 
+        public string DateString
+        {
+            get
+            {
+                var dateString = string.Empty;
+                if (StartDate != null)
+                {
+                    dateString += StartDate.ToString("MMM d") + StartDate.ToString(" @ h:mmt").ToLower();
+                    if (EndDateTime != null)
+                    {
+                        dateString += " - " + EndDateTime.ToString("h:mmt").ToLower();
+                    }
+                }
+                return dateString;
+            }
+        }
+
 
         public ObservableCollection<Reminder> Reminders;
 

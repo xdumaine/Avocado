@@ -8,8 +8,9 @@
     <common:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></common:BooleanToVisibilityConverter>
     <common:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"></common:InverseBooleanToVisibilityConverter>
     <common:BooleanToStringConverter x:Key="BooleanToStringConverter"></common:BooleanToStringConverter>
+    <common:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"></common:NullOrEmptyToVisibilityConverter>
 
-        <DataTemplate x:Key="Activity">
+    <DataTemplate x:Key="Activity">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80"/>
@@ -73,12 +74,19 @@
     </DataTemplate>
     
     <DataTemplate x:Key="CalendarItem">
-        <Grid>
-            <Grid.ColumnDefinitions>
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <TextBlock Text="{Binding Title}"></TextBlock>
-                <TextBlock Text="{Binding Description}"></TextBlock>
+        <Grid Margin="10,0,10,10">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding DateString}"  FontSize="20"/>
+                <TextBlock Text="{Binding Title}"  FontSize="20" TextWrapping="Wrap" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <TextBlock Text="{Binding Location}"/>
+                <TextBlock Text=" - " Visibility="{Binding Path=Description, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="10,0,0,0"/>
             </StackPanel>
         </Grid>
     </DataTemplate>
