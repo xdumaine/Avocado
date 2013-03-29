@@ -33,6 +33,9 @@ namespace Avocado.Models
         private static string API_DEV_KEY = "xnWY1vZw064tCoigoeLIUt9wkfpjg2x6DpKjZzEn4YlYAhyULGTuHsBoyKXd+a3x";
         private static string API_DEV_ID = "46";
 
+        private static string API2_URL_BASE = "http://avocado.azurewebsites.net/Home/";
+        private static string API2_URL_TILE = API2_URL_BASE + "TileContent";
+
         Windows.Storage.ApplicationDataContainer roamingSettings;
 
         public string Email { get; set; }
@@ -60,6 +63,17 @@ namespace Avocado.Models
                 avoSignature = value;
                 roamingSettings.Values["sessionSignature"] = value;
             }
+        }
+
+        public Uri GetTileUpdateUri(string userId)
+        {
+            var uriString = string.Empty;
+            if (!string.IsNullOrEmpty(AvoSignature) && !string.IsNullOrEmpty(CookieValue) && !string.IsNullOrEmpty(userId))
+            {
+                uriString = string.Format("{0}?id={1}&sessionCookie={2}&sessionSignature={3}", API2_URL_TILE, userId, CookieValue, AvoSignature);
+            }
+
+            return new Uri(uriString);
         }
 
         public AuthClient() 

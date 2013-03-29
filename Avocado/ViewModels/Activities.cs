@@ -40,6 +40,7 @@ namespace Avocado.ViewModel
         public static string CancelPostButtonText = "Cancel Post";
         public static SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
         public static InputDialog CaptionDialog;
+        public static TileUpdater LiveTileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
 
 
         public Activities()
@@ -52,7 +53,7 @@ namespace Avocado.ViewModel
             CaptionDialog.Background = AvocadoGreen;
             CaptionDialog.BorderBrush = new SolidColorBrush(Colors.Transparent);
             CaptionDialog.AcceptButton = PostButtonText;
-            CaptionDialog.CancelButton = CancelPostButtonText;
+            CaptionDialog.CancelButton = CancelPostButtonText;            
         }
         public AuthClient AuthClient { get; set; }
 
@@ -744,9 +745,12 @@ namespace Avocado.ViewModel
         public void UpdateLiveTile(ITileNotificationContent tileContent)
         {
             TileNotification notification = tileContent.CreateNotification();
-            TileUpdater updater = TileUpdateManager.CreateTileUpdaterForApplication();
-            updater.Clear();
-            updater.Update(notification);
+            
+            LiveTileUpdater.Clear();
+            LiveTileUpdater.Update(notification);
+            var uri = AuthClient.GetTileUpdateUri(Couple.CurrentUser.Id);
+            LiveTileUpdater.StartPeriodicUpdate(uri, PeriodicUpdateRecurrence.HalfHour);
+            
         }
 
 
