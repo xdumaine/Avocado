@@ -547,7 +547,7 @@ namespace Avocado.ViewModel
                 }
                 foreach (var item in calendarItems)
                 {
-                    item.ScheduleReminderNotifications(LiveToastNotifier);
+                    item.ScheduleReminderNotifications(LiveToastNotifier, Couple.CurrentUser.Id);
                 }
                 RaisePropertyChanged("CalendarItems"); 
             }

@@ -201,10 +201,14 @@ namespace Avocado.ViewModels
             Indicator = "•";
         }
 
-        public void ScheduleReminderNotifications(ToastNotifier notifier)
+        public void ScheduleReminderNotifications(ToastNotifier notifier, string userId)
         {
             foreach (var reminder in Reminders)
             {
+                if (reminder.UserId != userId)
+                {
+                    continue;
+                }
                 var toast = ToastContentFactory.CreateToastText04();
                 toast.TextHeading.Text = Title;
                 toast.TextBody2.Text = Location;
