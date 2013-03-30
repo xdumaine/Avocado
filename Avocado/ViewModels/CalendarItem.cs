@@ -60,7 +60,7 @@ namespace Avocado.ViewModels
             set
             {
                 startDate = value;
-                RaisePropertyChanged("StartDateTime");
+                RaisePropertyChanged("StartDate");
             }
         }
 
@@ -69,15 +69,15 @@ namespace Avocado.ViewModels
         {
             get
             {
-                if (startDate == null || startDate == DateTime.MinValue)
+                if (startDateTime == null || startDateTime == DateTime.MinValue)
                 {
-                    StartDate = Utilities.UnixTimeStampToDateTime(StartTime);
+                    StartDateTime = Utilities.UnixTimeStampToDateTime(StartTime);
                 }
                 return startDate;
             }
             set
             {
-                startDate = value;
+                startDateTime = value;
                 RaisePropertyChanged("StartDateTime");
             }
         }
