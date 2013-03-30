@@ -64,6 +64,24 @@ namespace Avocado.ViewModels
             }
         }
 
+        private DateTime startDateTime;
+        public DateTime StartDateTime
+        {
+            get
+            {
+                if (startDate == null || startDate == DateTime.MinValue)
+                {
+                    StartDate = Utilities.UnixTimeStampToDateTime(StartTime);
+                }
+                return startDate;
+            }
+            set
+            {
+                startDate = value;
+                RaisePropertyChanged("StartDateTime");
+            }
+        }
+
         private DateTime endDateTime;
         public DateTime EndDateTime
         {
@@ -189,14 +207,16 @@ namespace Avocado.ViewModels
             {
                 var toast = ToastContentFactory.CreateToastText04();
                 toast.TextHeading.Text = Title;
-                toast.TextBody1.Text = DateString;
                 toast.TextBody2.Text = Location;
 
                 var reminderTime = Utilities.UnixTimeStampToDateTime(StartTime - reminder.Interval);
-                var timeString = IntervalToString(StartDate - reminderTime);
+                var timeString = IntervalToString(StartDateTime - reminderTime);
+                toast.TextBody1.Text = timeString;
+
                 toast.Duration = ToastDuration.Long;
                 toast.Audio.Loop = false;
                 toast.Audio.Content = ToastAudioContent.Reminder;
+
                 if (reminderTime < DateTime.Now)
                 {
                     continue;
@@ -220,6 +240,10 @@ namespace Avocado.ViewModels
             else if ((int)interval.TotalHours > 1)
             {
                 return string.Format("in {0} hours", (int)interval.TotalHours);
+            }
+            else if ((int)interval.TotalHours == 1)
+            {
+                return string.Format("in {0} hour", (int)interval.TotalHours);
             }
             else if ((int)interval.TotalMinutes > 1)
             {
