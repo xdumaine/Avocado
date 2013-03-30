@@ -105,6 +105,10 @@
       <Project>{16595b30-4df5-48fa-b92f-20633d51ed3e}</Project>
       <Name>MetroMVVM</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Win8Controls\Win8Controls.csproj">
+      <Project>{805dc740-6020-4582-a0c1-4e0f473e8ba6}</Project>
+      <Name>Win8Controls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WinRTXamlToolkit\WinRTXamlToolkit.csproj">
       <Project>{7b7966be-213f-4b84-867d-2a0ccf61245f}</Project>
       <Name>WinRTXamlToolkit</Name>
@@ -231,9 +235,6 @@
     </Reference>
     <Reference Include="System.Reactive.PlatformServices">
       <HintPath>..\packages\Rx-PlatformServices.2.0.21114\lib\WinRT45\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Win8Controls">
-      <HintPath>..\packages\Win8Controls.0.9.2\lib\netcore45\Win8Controls.dll</HintPath>
     </Reference>
     <Reference Include="Win8nl">
       <HintPath>..\packages\Win8nl.1.0.7\lib\NetCore45\Win8nl.dll</HintPath>

@@ -419,13 +419,26 @@ namespace Avocado.ViewModel
             set
             {
                 selectedTab = value;
-                //Update();
                 RaisePropertyChanged("SelectedTab");
                 RaisePropertyChanged("IsActivityTabActive");
                 RaisePropertyChanged("IsMediaTabActive");
                 RaisePropertyChanged("IsListTabActive");
                 RaisePropertyChanged("IsCalendarTabActive");
                 RaisePropertyChanged("IsPreferenceTabActive");
+
+                if (value == TabType.Calendar)
+                {
+                    var firstItem = (from e in CalendarItems
+                                    select e).FirstOrDefault();
+                    if (firstItem == null)
+                    {
+                        SelectedDate = DateTime.Today;
+                    }
+                    else
+                    {
+                        SelectedCalendarItem = firstItem;
+                    }
+                }
             }
         }
         
@@ -551,6 +564,12 @@ namespace Avocado.ViewModel
             {
                 selectedDate = value;
                 RaisePropertyChanged("SelectedDate");
+
+                // set it and raise property changed manually to prevent circular reference setting
+                selectedCalendarItem = (from item in CalendarItems
+                                        where item.StartDate == SelectedDate
+                                        select item).FirstOrDefault();
+                RaisePropertyChanged("SelectedCalendarItem");
             }
         }
 
@@ -565,12 +584,16 @@ namespace Avocado.ViewModel
             {
                 selectedCalendarItem = value;
                 RaisePropertyChanged("SelectedCalendarItem");
+
+                // set it and raise property changed manually to prevent circular reference setting
+                selectedDate = selectedCalendarItem.StartDate;
+                RaisePropertyChanged("SelectedDate");
             }
         }
 
         public void SelectDate(DateTime date)
         {
-
+            SelectedDate = date;
         }
 
         public ICommand SelectDateCommand
