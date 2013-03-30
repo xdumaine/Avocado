@@ -73,7 +73,7 @@ namespace Avocado.ViewModels
                 {
                     StartDateTime = Utilities.UnixTimeStampToDateTime(StartTime);
                 }
-                return startDate;
+                return startDateTime;
             }
             set
             {
@@ -154,9 +154,9 @@ namespace Avocado.ViewModels
             get
             {
                 var dateString = string.Empty;
-                if (StartDate != null)
+                if (StartDateTime != null)
                 {
-                    dateString += StartDate.ToString("MMM d") + StartDate.ToString(" @ h:mmt").ToLower();
+                    dateString += StartDateTime.ToString("MMM d") + StartDateTime.ToString(" @ h:mmt").ToLower();
                     if (EndDateTime != null)
                     {
                         dateString += " - " + EndDateTime.ToString("h:mmt").ToLower();
