@@ -60,6 +60,8 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock VerticalAlignment="Center" Name="ListItemText" FontSize="20" TextWrapping="Wrap" Text="{Binding Path=Text}"/>
+                <!--Uncomment this line to show list item Ids. Useful for debugging --> 
+                <!--<TextBlock Text="{Binding Path=Id}"/>-->
                 <!-- This is a hack to get strikethrough on a textblock -->
                 <Line Grid.Column="0" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Visibility="{Binding Complete, Converter={StaticResource BooleanToVisibilityConverter}}" Stroke="#88FFFFFF" Stretch="Fill" 
                       Width="{Binding ElementName=ListItemText, Path=Width}" StrokeThickness="2" X1="1"   />

@@ -150,7 +150,11 @@ namespace Avocado.ViewModel
                                      where list.Id == value.Id
                                      select list).First();
                 SelectedTab = TabType.Lists;
-                selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y)); 
+
+                //wat
+                selectedListModel.Items.CollectionChanged -= new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
+                selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
+ 
                 RaisePropertyChanged("SelectedListModel"); 
             } 
         }
@@ -351,11 +355,24 @@ namespace Avocado.ViewModel
                 {
                     IsLoading = true;
                     var index = GetListItemIndex(SelectedListModel, false, false);
-                    SelectedListModel.Items.Insert(index, new AvoListItem() { Text = NewListItemText });
+                    var newItem = new AvoListItem() { Text = NewListItemText, Id = "-1", ListId = SelectedListModel.Id };
+                    SelectedListModel.Items.Insert(index, newItem);
                     var clone = NewListItemText;
-                    var task = ThreadPool.RunAsync(t => AuthClient.CreateListItem(clone, SelectedListModel.Id, index));
+                    var finalItem = newItem;
+                    var task = ThreadPool.RunAsync(t =>
+                    {
+                        finalItem = AuthClient.CreateListItem(clone, SelectedListModel.Id, index);
+                        finalItem.ListId = newItem.ListId;
+                    });
 
-                    task.Completed = RunOnComplete(Update);
+                    task.Completed = RunOnComplete(() => {
+                        var i = SelectedListModel.Items.IndexOf(newItem);
+                        if (i >= 0)
+                        {
+                            SelectedListModel.Items[i] = finalItem;
+                        }
+                        IsLoading = false; 
+                    });
 
                 }
                 NewListItemText = "";
@@ -403,6 +420,7 @@ namespace Avocado.ViewModel
             set
             {
                 selectedTab = value;
+                //Update();
                 RaisePropertyChanged("SelectedTab");
                 RaisePropertyChanged("IsActivityTabActive");
                 RaisePropertyChanged("IsMediaTabActive");
@@ -697,7 +715,7 @@ namespace Avocado.ViewModel
             //restore the selected tab in case restoring the selected list caused this to change
             SelectedTab = tab;
             IsLoading = false;
-            SetLiveTile();
+            UpdateLiveTile();
 
         }
 
@@ -709,50 +727,12 @@ namespace Avocado.ViewModel
             task.Completed = RunOnComplete(ProcessUpdate);
         }
 
-        public void SetLiveTile()
+        public void UpdateLiveTile()
         {
-            // get the first image, or the first message from the other user
-            var message = (from a in ActivityList
-                           where a.IsList == false && a.IsEvent == false
-                           && (a.IsMessage == false || a.User.Id != Couple.CurrentUser.Id)
-                           select a).FirstOrDefault();
-            
-            if (message.IsImage)
-            {
-                // TODO: use a different template if the image has a caption?
-                var tileContent = TileContentFactory.CreateTileWideImage();
-                tileContent.Image.Src = message.Data.ImageUrls.Small;
-
-                var squareContent = TileContentFactory.CreateTileSquareImage();
-                squareContent.Image.Src = message.Data.ImageUrls.Small;
-                tileContent.SquareContent = squareContent;
-                UpdateLiveTile(tileContent);
-            }
-            else if (message.IsMessage)
-            {
-                var tileContent = TileContentFactory.CreateTileWideImageAndText01();
-                tileContent.Image.Src = message.User.AvatarUrl;
-                tileContent.TextCaptionWrap.Text = message.Data.Text;
-
-                var squareContent = TileContentFactory.CreateTileSquareText04();
-                squareContent.TextBodyWrap.Text = message.Data.Text;
-                tileContent.SquareContent = squareContent;
-                UpdateLiveTile(tileContent);
-                
-            }
-        }
-
-        public void UpdateLiveTile(ITileNotificationContent tileContent)
-        {
-            TileNotification notification = tileContent.CreateNotification();
-            
             LiveTileUpdater.Clear();
-            LiveTileUpdater.Update(notification);
             var uri = AuthClient.GetTileUpdateUri(Couple.CurrentUser.Id);
-            LiveTileUpdater.StartPeriodicUpdate(uri, PeriodicUpdateRecurrence.HalfHour);
-            
+            var start = DateTimeOffset.Now.AddMinutes(5);
+            LiveTileUpdater.StartPeriodicUpdate(uri, start, PeriodicUpdateRecurrence.HalfHour);
         }
-
-
     }
 }

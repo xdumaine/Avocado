@@ -33,7 +33,7 @@ namespace Avocado.Models
         private static string API_DEV_KEY = "xnWY1vZw064tCoigoeLIUt9wkfpjg2x6DpKjZzEn4YlYAhyULGTuHsBoyKXd+a3x";
         private static string API_DEV_ID = "46";
 
-        private static string API2_URL_BASE = "http://avocado.azurewebsites.net/Home/";
+        private static string API2_URL_BASE = "http://avocado.azurewebsites.net/Home";
         private static string API2_URL_TILE = API2_URL_BASE + "TileContent";
 
         Windows.Storage.ApplicationDataContainer roamingSettings;
@@ -257,6 +257,10 @@ namespace Avocado.Models
 
         public void EditListItem(AvoListItem listItem, int index, bool delete = false)
         {
+            if (listItem.Id == "-1")
+            {
+                return;
+            }
             var uri = new Uri(API_URL_LISTS + listItem.ListId + "/" + listItem.Id + (delete ? "/delete" : ""));
             var body = new FormUrlEncodedContent(new[] { 
                     new KeyValuePair<string, string>("text", listItem.Text), 
@@ -272,11 +276,11 @@ namespace Avocado.Models
             response.EnsureSuccessStatusCode();
         }
 
-        public void CreateListItem(string listItemText, string listId, int index)
+        public AvoListItem CreateListItem(string listItemText, string listId, int index)
         {
             if (string.IsNullOrEmpty(listItemText))
             {
-                return;
+                return null;
             }
 
             var uri = new Uri(API_URL_LISTS + listId);
@@ -286,6 +290,9 @@ namespace Avocado.Models
             });
             var response = Post(uri, body);
             response.EnsureSuccessStatusCode();
+
+            var listItem = JsonConvert.DeserializeObject<AvoListItem>(response.Content.ReadAsStringAsync().Result);
+            return listItem;
         }
 
         public void SendMessage(string message)
