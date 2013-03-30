@@ -527,6 +527,11 @@ namespace Avocado.ViewModel
             set 
             { 
                 calendarItems = value;
+                // clear all notifications, then update them.
+                foreach (var item in LiveToastNotifier.GetScheduledToastNotifications())
+                {
+                    LiveToastNotifier.RemoveFromSchedule(item);
+                }
                 foreach (var item in calendarItems)
                 {
                     item.ScheduleReminderNotifications(LiveToastNotifier);
