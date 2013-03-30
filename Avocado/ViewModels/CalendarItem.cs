@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Avocado.Models;
 using Avocado.ViewModel;
 using MetroMVVM;
+using MetroMVVM.NotificationsExtensions.ToastContent;
+using Windows.UI.Notifications;
 
 namespace Avocado.ViewModels
 {
@@ -182,6 +181,54 @@ namespace Avocado.ViewModels
         public CalendarItem()
         {
             Indicator = "•";
+        }
+
+        public void ScheduleReminderNotifications(ToastNotifier notifier)
+        {
+            foreach (var reminder in Reminders)
+            {
+                var toast = ToastContentFactory.CreateToastText04();
+                toast.TextHeading.Text = Title;
+                toast.TextBody1.Text = DateString;
+                toast.TextBody2.Text = Location;
+
+                var reminderTime = Utilities.UnixTimeStampToDateTime(StartTime - reminder.Interval);
+                var timeString = IntervalToString(StartDate - reminderTime);
+                toast.Duration = ToastDuration.Long;
+                toast.Audio.Loop = false;
+                toast.Audio.Content = ToastAudioContent.Reminder;
+                if (reminderTime < DateTime.Now)
+                {
+                    continue;
+                }
+                var scheduled = new ScheduledToastNotification(toast.CreateNotification().Content, reminderTime);
+                
+                notifier.AddToSchedule(scheduled);
+            }
+        }
+
+        private string IntervalToString(TimeSpan interval)
+        { 
+            if ((int)interval.TotalDays > 1)
+            {
+                return DateString;
+            }
+            else if ((int)interval.TotalDays == 1 || (int)interval.TotalHours > 12)
+            {
+                return string.Format("tomorrow at {0}:{1}", StartDate.Hour, StartDate.Minute);
+            }
+            else if ((int)interval.TotalHours > 1)
+            {
+                return string.Format("in {0} hours", (int)interval.TotalHours);
+            }
+            else if ((int)interval.TotalMinutes > 1)
+            {
+                return string.Format("in {0} minutes", (int)interval.TotalMinutes);
+            }
+            else
+            {
+                return string.Format("Now");
+            }
         }
     }
 }

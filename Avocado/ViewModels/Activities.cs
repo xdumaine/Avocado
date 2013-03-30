@@ -10,7 +10,6 @@ using Avocado.Models;
 using Avocado.ViewModels;
 using MetroMVVM;
 using MetroMVVM.Commands;
-using MetroMVVM.NotificationsExtensions.TileContent;
 using MetroMVVM.Threading;
 using Windows.Foundation;
 using Windows.Storage;
@@ -41,7 +40,7 @@ namespace Avocado.ViewModel
         public static SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
         public static InputDialog CaptionDialog;
         public static TileUpdater LiveTileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
-
+        public static ToastNotifier LiveToastNotifier = ToastNotificationManager.CreateToastNotifier();
 
         public Activities()
         {
@@ -527,7 +526,11 @@ namespace Avocado.ViewModel
             }
             set 
             { 
-                calendarItems = value; 
+                calendarItems = value;
+                foreach (var item in calendarItems)
+                {
+                    item.ScheduleReminderNotifications(LiveToastNotifier);
+                }
                 RaisePropertyChanged("CalendarItems"); 
             }
         }

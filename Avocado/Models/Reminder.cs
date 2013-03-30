@@ -3,9 +3,9 @@ namespace Avocado.Models
 {
     public class Reminder
     {
-        string Id;
-        string UserId;
-        string Type;
-        double Interval;
+        public string Id;
+        public string UserId;
+        public string Type;
+        public double Interval;
     }
 }
