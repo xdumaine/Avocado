@@ -33,7 +33,7 @@ namespace Avocado.Models
         private static string API_DEV_KEY = "xnWY1vZw064tCoigoeLIUt9wkfpjg2x6DpKjZzEn4YlYAhyULGTuHsBoyKXd+a3x";
         private static string API_DEV_ID = "46";
 
-        private static string API2_URL_BASE = "http://avocado.azurewebsites.net/Home";
+        private static string API2_URL_BASE = "http://avocado.azurewebsites.net/Home/";
         private static string API2_URL_TILE = API2_URL_BASE + "TileContent";
 
         Windows.Storage.ApplicationDataContainer roamingSettings;

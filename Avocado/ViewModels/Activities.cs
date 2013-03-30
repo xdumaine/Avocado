@@ -739,8 +739,7 @@ namespace Avocado.ViewModel
         {
             LiveTileUpdater.Clear();
             var uri = AuthClient.GetTileUpdateUri(Couple.CurrentUser.Id);
-            var start = DateTimeOffset.Now.AddMinutes(5);
-            LiveTileUpdater.StartPeriodicUpdate(uri, start, PeriodicUpdateRecurrence.HalfHour);
+            LiveTileUpdater.StartPeriodicUpdate(uri, PeriodicUpdateRecurrence.HalfHour);
         }
     }
 }
