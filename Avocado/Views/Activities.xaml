@@ -141,8 +141,15 @@
             </Grid.RowDefinitions>
             <TextBlock TextWrapping="Wrap" Grid.Row="2" Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, Path=SelectedActivity.IsMessage}"
                    FontSize="30" Text="{Binding Path=SelectedActivity.Data.Text}" VerticalAlignment="Top" FontWeight="Light" />
-            <Image Grid.Row="2" Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, Path=SelectedActivity.IsImage}" 
-                   Source="{Binding Path=SelectedActivity.Data.Url}"/>
+            <Grid Name="ActivityMediaDetail" Visibility="{Binding Converter={StaticResource BooleanToVisibilityConverter}, Path=SelectedActivity.IsImage}" 
+              Margin="20,60,20,0" Grid.Row="0" Grid.RowSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Source="{Binding Path=SelectedActivity.Data.Url}" Grid.Row="0"/>
+                <TextBlock Text="{Binding Path=SelectedActivity.Data.Caption}" Grid.Row="1" HorizontalAlignment="Center" FontSize="60" Margin="10" FontWeight="Light" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Grid>
         </Grid>
         
         <Grid Name="ListDetail" Margin="20,0,20,0" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" 
