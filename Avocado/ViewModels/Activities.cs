@@ -39,7 +39,8 @@ namespace Avocado.ViewModel
         
         public const string PostButtonText = "Post";
         public const string CancelPostButtonText = "Cancel Post";
-        public const SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
+        public static SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
+        public ObservableCollection<string> RecurrenceTypes = new ObservableCollection<string>() { "none", "daily", "weekly", "weekdays", "monthly", "yearly" };
         
         #endregion
 
@@ -543,6 +544,85 @@ namespace Avocado.ViewModel
             get
             {
                 return new RelayCommand<DateTime>(d => SelectDate(d));
+            }
+        }
+
+        private CalendarItem editingCalendarItem;
+        public CalendarItem EditingCalendarItem
+        {
+            get
+            {
+                return editingCalendarItem;
+            }
+            set
+            {
+                editingCalendarItem = value;
+                RaisePropertyChanged("EditingCalendarItem");
+            }
+        }
+
+        private bool isEventEditPaneVisible;
+        public bool IsEventEditPaneVisible
+        {
+            get
+            {
+                return isEventEditPaneVisible && IsCalendarTabActive;
+            }
+            set
+            {
+                isEventEditPaneVisible = value;
+                RaisePropertyChanged("IsEventEditPaneVisible");
+            }
+        }
+
+        public void BeginEditCalendarItem()
+        {
+            IsEventEditPaneVisible = true;
+            EditingCalendarItem = new CalendarItem()
+            {
+                Title = SelectedCalendarItem.Title,
+                Location = SelectedCalendarItem.Location,
+                Attending = SelectedCalendarItem.Attending,
+                StartTime = SelectedCalendarItem.StartTime,
+                EndTime = SelectedCalendarItem.EndTime,
+                Description = SelectedCalendarItem.Description,
+                Id = SelectedCalendarItem.Id,
+                StartDateTime = SelectedCalendarItem.StartDateTime
+            };
+        }
+
+        public void BeginNewCalendarItem()
+        {
+            IsEventEditPaneVisible = true;
+            EditingCalendarItem = new CalendarItem() { Id = "-1" };
+        }
+
+        public ICommand EditEventCommand
+        {
+            get
+            {
+                return new RelayCommand(() => BeginEditCalendarItem());
+            }
+        }
+
+        public ICommand NewEventCommand
+        {
+            get
+            {
+                return new RelayCommand(() => BeginNewCalendarItem());
+            }
+        }
+
+        public void CancelEditEvent()
+        {
+            IsEventEditPaneVisible = false;
+        }
+
+        public ICommand CancelEditEventCommand
+        {
+            get
+            {
+                return new RelayCommand(() => CancelEditEvent());
             }
         }
 

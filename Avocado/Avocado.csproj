@@ -109,6 +109,10 @@
       <Project>{805dc740-6020-4582-a0c1-4e0f473e8ba6}</Project>
       <Name>Win8Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WinRT-XAML-DatePicker\Src\WinRTDatePicker\WinRTDatePicker.csproj">
+      <Project>{1aa45f25-34d5-4121-904e-394b5b39d03f}</Project>
+      <Name>WinRTDatePicker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WinRTXamlToolkit\WinRTXamlToolkit.csproj">
       <Project>{7b7966be-213f-4b84-867d-2a0ccf61245f}</Project>
       <Name>WinRTXamlToolkit</Name>

@@ -4,6 +4,7 @@
     xmlns:local="using:Avocado.Views.Partial" xmlns:Win8Controls="using:Win8Controls" mc:Ignorable="d"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:common="using:Avocado.Common"
+    xmlns:WinRTDatePicker="using:WinRTDatePicker"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
 
     <common:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></common:BooleanToVisibilityConverter>
@@ -650,5 +651,6 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     
 </ResourceDictionary>

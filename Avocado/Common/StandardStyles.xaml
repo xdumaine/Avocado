@@ -1957,4 +1957,14 @@
         <Setter Property="AutomationProperties.Name" Value="New Event"/>
         <Setter Property="Content" Value="&#xE1DB;"/>
     </Style>
+    
+    <Style x:Key="CancelButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+        <Setter Property="AutomationProperties.AutomationId" Value="CancelButton"/>
+        <Setter Property="Content" Value="&#xE10A;"/>
+    </Style>
+
+    <Style x:Key="SaveButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource AppBarButtonStyle}">
+        <Setter Property="AutomationProperties.AutomationId" Value="SaveButton"/>
+        <Setter Property="Content" Value="&#xE105;"/>
+    </Style>
 </ResourceDictionary>

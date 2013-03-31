@@ -2,6 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:common="using:Avocado.Common"
+    xmlns:WinRTDatePicker="using:WinRTDatePicker"
     xmlns:controls="using:WinRTXamlToolkit.Controls"
     xmlns:local="using:Avocado.Views.Partial">
     
@@ -103,5 +104,26 @@
             <Image Source="{Binding Path=ImageUrls.Medium}"  Stretch="UniformToFill"/>
         </Grid>
     </DataTemplate>
-    
+
+    <Style x:Key="DatePickerStyle1"
+               TargetType="WinRTDatePicker:DatePicker">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="WinRTDatePicker:DatePicker">
+                    <StackPanel Background="{TemplateBinding Background}">
+                        <ComboBox x:Name="DayOptions"
+                                      VerticalAlignment="Top"
+                                      Background="#CCFF0000" />
+                        <ComboBox x:Name="MonthOptions"
+                                      VerticalAlignment="Top"
+                                      Background="#CC17FF00" />
+                        <ComboBox x:Name="YearOptions"
+                                      VerticalAlignment="Top"
+                                      Background="#CC0023FF" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
