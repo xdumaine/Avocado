@@ -25,11 +25,22 @@
     -->
     <Page.BottomAppBar>
         <AppBar>
-            <StackPanel Orientation="Horizontal">
-                <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding RefreshCommand}"/>
-                <Button Style="{StaticResource UploadPhotoAppBarButtonStyle}" Command="{Binding AddPhotoCommand}" Visibility="{Binding IsMediaTabActive,Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <Button Style="{StaticResource ClearAppBarButtonStyle}" Command="{Binding ClearListActivitiesCommand}" Visibility="{Binding IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Style="{StaticResource RefreshAppBarButtonStyle}" Command="{Binding RefreshCommand}"/>
+                    <Button Style="{StaticResource UploadPhotoAppBarButtonStyle}" Command="{Binding AddPhotoCommand}" Visibility="{Binding IsMediaTabActive,Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <Button Style="{StaticResource DeleteActivityAppBarButtonStyle}" Command="{Binding DeleteActivityCommand}" Visibility="{Binding IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Style="{StaticResource ClearAppBarButtonStyle}" Command="{Binding ClearListActivitiesCommand}" Visibility="{Binding IsActivityTabActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <Button Style="{StaticResource EditEventAppBarButtonStyle}" Command="{Binding EditEventCommand}" Visibility="{Binding IsCalendarTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource NewEventAppBarButtonStyle}" Command="{Binding NewEventCommand}" Visibility="{Binding IsCalendarTabActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </Grid>
         </AppBar>
     </Page.BottomAppBar>
     <Grid Style="{StaticResource LayoutRootStyle}">

@@ -71,93 +71,6 @@ namespace Avocado.ViewModel
             } 
         }
 
-        private List<Activity> activityList;
-        public List<Activity> ActivityList 
-        { 
-            get 
-            { 
-                return activityList; 
-            } 
-            set 
-            { 
-                activityList = value; 
-                RaisePropertyChanged("ActivityList"); 
-            } 
-        }
-
-        private List<AvoList> listModelList;
-        public List<AvoList> ListModelList 
-        { 
-            get 
-            { 
-                return listModelList; 
-            } 
-            set 
-            { 
-                listModelList = value; 
-                RaisePropertyChanged("ListModelList"); 
-            } 
-        }
-
-        private List<Media> mediaList;
-        public List<Media> MediaList 
-        { 
-            get 
-            { 
-                return mediaList; 
-            } 
-            set 
-            { 
-                mediaList = value; 
-                RaisePropertyChanged("MediaList"); 
-            } 
-        }
-
-        public Media selectedMediaListItem;
-        public Media SelectedMediaListItem 
-        { 
-            get 
-            { 
-                return selectedMediaListItem; 
-            } 
-            set 
-            { 
-                selectedMediaListItem = value; 
-                RaisePropertyChanged("SelectedMediaListItem"); 
-            } 
-        }
-        
-        private AvoList selectedListModel;
-        public AvoList SelectedListModel { 
-            get 
-            {
-                if (selectedListModel == null && ListModelList != null && ListModelList.Count > 0)
-                {
-                    SelectedListModel = ListModelList.First();
-                }
-                return selectedListModel; 
-            } 
-            set 
-            {
-                if (value == null)
-                {
-                    return;
-                }
-                // The value passed will not equal an actual list object in the list model list, so find
-                // the real one with linq by the Id, and use that one.
-                selectedListModel = (from list in ListModelList
-                                     where list.Id == value.Id
-                                     select list).First();
-                SelectedTab = TabType.Lists;
-
-                //wat
-                selectedListModel.Items.CollectionChanged -= new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
-                selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
- 
-                RaisePropertyChanged("SelectedListModel"); 
-            } 
-        }
-
         private string newMessage;
         public string NewMessage 
         { 
@@ -210,36 +123,6 @@ namespace Avocado.ViewModel
             }
         }
 
-        private Activity selectedActivity;
-        public Activity SelectedActivity 
-        { 
-            get 
-            { 
-                return selectedActivity; 
-            } 
-            set 
-            { 
-                selectedActivity = value;
-                if (value == null)
-                {
-                    return;
-                }
-                if (selectedActivity.Type == "list")
-                {
-                    SelectedListModel = AuthClient.GetList(selectedActivity.Data.Id);
-                }
-                RaisePropertyChanged("SelectedActivity");
-            } 
-        }
-
-        public ICommand RefreshCommand
-        {
-            get
-            {
-                return new RelayCommand(() => Update() );
-            }
-        }
-
         public void Logout()
         {
 
@@ -267,6 +150,52 @@ namespace Avocado.ViewModel
         }
 
         #region ListItemActions
+
+        private List<AvoList> listModelList;
+        public List<AvoList> ListModelList
+        {
+            get
+            {
+                return listModelList;
+            }
+            set
+            {
+                listModelList = value;
+                RaisePropertyChanged("ListModelList");
+            }
+        }
+
+        private AvoList selectedListModel;
+        public AvoList SelectedListModel
+        {
+            get
+            {
+                if (selectedListModel == null && ListModelList != null && ListModelList.Count > 0)
+                {
+                    SelectedListModel = ListModelList.First();
+                }
+                return selectedListModel;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    return;
+                }
+                // The value passed will not equal an actual list object in the list model list, so find
+                // the real one with linq by the Id, and use that one.
+                selectedListModel = (from list in ListModelList
+                                     where list.Id == value.Id
+                                     select list).First();
+                SelectedTab = TabType.Lists;
+
+                //wat
+                selectedListModel.Items.CollectionChanged -= new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
+                selectedListModel.Items.CollectionChanged += new NotifyCollectionChangedEventHandler((t, y) => ListItemDrop(t, y));
+
+                RaisePropertyChanged("SelectedListModel");
+            }
+        }
 
         private object ListItemDrop(object t, NotifyCollectionChangedEventArgs y)
         {
@@ -608,6 +537,34 @@ namespace Avocado.ViewModel
 
         #region Media
 
+        private List<Media> mediaList;
+        public List<Media> MediaList
+        {
+            get
+            {
+                return mediaList;
+            }
+            set
+            {
+                mediaList = value;
+                RaisePropertyChanged("MediaList");
+            }
+        }
+
+        public Media selectedMediaListItem;
+        public Media SelectedMediaListItem
+        {
+            get
+            {
+                return selectedMediaListItem;
+            }
+            set
+            {
+                selectedMediaListItem = value;
+                RaisePropertyChanged("SelectedMediaListItem");
+            }
+        }
+
         public void AddPhoto()
         {
             // We need to run this async, but on the UI thread (... yeah, me either)
@@ -666,6 +623,44 @@ namespace Avocado.ViewModel
 
         #endregion
 
+        #region Activities
+
+        private List<Activity> activityList;
+        public List<Activity> ActivityList
+        {
+            get
+            {
+                return activityList;
+            }
+            set
+            {
+                activityList = value;
+                RaisePropertyChanged("ActivityList");
+            }
+        }
+
+        private Activity selectedActivity;
+        public Activity SelectedActivity
+        {
+            get
+            {
+                return selectedActivity;
+            }
+            set
+            {
+                selectedActivity = value;
+                if (value == null)
+                {
+                    return;
+                }
+                if (selectedActivity.Type == "list")
+                {
+                    SelectedListModel = AuthClient.GetList(selectedActivity.Data.Id);
+                }
+                RaisePropertyChanged("SelectedActivity");
+            }
+        }
+
         public void ClearListActivities()
         {
             DispatcherHelper.CheckBeginInvokeOnUI(ConfirmClearListActivities);
@@ -690,8 +685,8 @@ namespace Avocado.ViewModel
         public async void ClearListActivitesAsync()
         {
             var listActivities = (from a in ActivityList
-                                   where a.IsList == true
-                                   select a).ToList();
+                                  where a.IsList == true
+                                  select a).ToList();
             foreach (var listActivity in listActivities)
             {
                 AuthClient.DeleteActivity(listActivity.Id);
@@ -706,12 +701,40 @@ namespace Avocado.ViewModel
             }
         }
 
+        public void DeleteActivity()
+        {
+            IsLoading = true;
+            var idToDelete = SelectedActivity.Id;
+            var task = ThreadPool.RunAsync(t => { AuthClient.DeleteActivity(idToDelete); });
+            task.Completed = RunOnComplete(Update);
+        }
+
+        public ICommand DeleteActivityCommand
+        {
+            get
+            {
+                return new RelayCommand(() => DeleteActivity());
+            }
+        }
+
+        #endregion
+
         public AsyncActionCompletedHandler RunOnComplete(Action method)
         {
             return new AsyncActionCompletedHandler((IAsyncAction source, AsyncStatus status) =>
             {
                 DispatcherHelper.CheckBeginInvokeOnUI(() => { method(); });
             });
+        }
+
+        #region Updating
+
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                return new RelayCommand(() => Update());
+            }
         }
 
         public async Task UpdateData()
@@ -764,5 +787,7 @@ namespace Avocado.ViewModel
             var uri = AuthClient.GetTileUpdateUri(Couple.CurrentUser.Id);
             LiveTileUpdater.StartPeriodicUpdate(uri, PeriodicUpdateRecurrence.HalfHour);
         }
+
+        #endregion
     }
 }
