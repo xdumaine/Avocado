@@ -35,12 +35,21 @@ namespace Avocado.ViewModel
 
     class Activities : ObservableObject
     {
-        public static string PostButtonText = "Post";
-        public static string CancelPostButtonText = "Cancel Post";
-        public static SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
+        #region Constants
+        
+        public const string PostButtonText = "Post";
+        public const string CancelPostButtonText = "Cancel Post";
+        public const SolidColorBrush AvocadoGreen = new SolidColorBrush(Color.FromArgb(0xFF, 0x62, 0x94, 0x3C));
+        
+        #endregion
+
+        #region Static Members
+
         public static InputDialog CaptionDialog;
         public static TileUpdater LiveTileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
         public static ToastNotifier LiveToastNotifier = ToastNotificationManager.CreateToastNotifier();
+
+        #endregion
 
         public Activities()
         {
@@ -70,6 +79,8 @@ namespace Avocado.ViewModel
                 RaisePropertyChanged("NewMessagePrompt"); 
             } 
         }
+
+        #region Messages
 
         private string newMessage;
         public string NewMessage 
@@ -122,6 +133,8 @@ namespace Avocado.ViewModel
                 return new RelayCommand<KeyRoutedEventArgs>(args => { NewMessageKeyDown(args); });
             }
         }
+
+        #endregion
 
         public void Logout()
         {
